@@ -315,12 +315,64 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut pc: usize)  -> usize {
    }
 
 
+    // REGM8 
+    
+
+    // RLC 
+    // rotate left accumulator 
+    // 11101010 becomes 01110101
+    // only carry flag is affected
+    //https://www.daenotes.com/electronics/digital-electronics/instruction-set-intel-8085
+    0x07 => {
+        state.flag.carry = if state.accumulator & 0x01 == 1 {true} else {false};
+        state.accumulator = (state.accumulator >> 1) | (state.accumulator << 7);
+    }
+    // RAL 
+    // rotate left accumulator through carry flag
+    // D7 is placed in carry flag and D0 will hold carry flag
+    0x17 => {
+        let buffer = state.accumulator;
+        let mut carry_data: u8= if state.flag.carry == true {1}  else {0};
+        carry_data= carry_data << 7;
+        state.accumulator = (state.accumulator >> 1) | carry_data;
+        state.flag.carry = if buffer & 0x01 == 1 {true} else {false};
+    }
+
+    //RRC 
+    //roate accumulator to right
+    0x0f => {
+        state.flag.carry = if state.accumulator & 0b10000000 == 1 {true} else {false};
+        state.accumulator = (state.accumulator << 1) | (state.accumulator >> 7);
+    }
 
 
+    // RAR 
+    // rotate accumulator to right but carry flag comes to play 
+    0x1f => {
+        let buffer = state.accumulator;
+        let mut carry_data: u8= if state.flag.carry == true {1}  else {0};
+        state.accumulator = (state.accumulator << 1) | carry_data;
+        state.flag.carry = if buffer & 0b10000000 == 1 {true} else {false};
+    }
+    
 
-   
+    // CMA 
+    // contents of accumulator is complemented
+    0x2f => {
+        state.accumulator = !state.accumulator;
+    }
 
-
+    // CMC 
+    // carry flag is complemented
+    0x3f => {
+        state.flag.carry = !state.flag.carry; 
+    }
+    
+    // STC
+    // set carry flag. makes carry flag : 1
+    0x37 => {
+        state.flag.carry = true;
+    }
 
     // STAX B
     // store the contents of accumulator to  
