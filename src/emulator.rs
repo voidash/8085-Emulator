@@ -3,6 +3,7 @@
  *
  *
  */
+
 // 8085 is little endian 
 
 use crate::core::{Processor8085,CARRY};
@@ -29,7 +30,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut pc: usize)  -> usize {
     // LXI B, data
     // load data into BC register pair immediate
     0x01 =>  { 
-        //due to little endianess 4455 is divided into 55 44 
+        // due to little endianess 4455 is divided into 55 44 
         // least significant byte comes first
         // so c will hold least significant byte 
         // b will hold most significant byte
@@ -256,6 +257,70 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut pc: usize)  -> usize {
 	 0xbf=> { // CMP A
         subtract_byte(state, state.accumulator, state.accumulator, CARRY::UPDATE_CARRY);
     }
+    
+   // ADI  data
+   // Add immediate data to accumulator
+   0xc6 => {
+       let rhs = opcode[1];
+        state.accumulator = add_byte(state, state.accumulator, rhs, CARRY::UPDATE_CARRY);
+   }
+
+   // ACI data 
+   // add immediate data to accumulator + carry
+   0xce => {
+       let rhs = opcode[1];
+       state.accumulator = add_byte_with_carry(state, state.accumulator, rhs, CARRY::UPDATE_CARRY);
+   }
+
+
+   // SUI data 
+   // subtract immediate data to accumulator
+   0xd6 => {
+       let rhs = opcode[1];
+        state.accumulator = subtract_byte(state, state.accumulator, rhs, CARRY::UPDATE_CARRY);
+   }
+
+   // SBI data 
+   // subtract immediate data to accumulator with borrow
+   0xde => {
+       let rhs = opcode[1];
+        state.accumulator = subtract_byte_with_borrow(state, state.accumulator, rhs, CARRY::UPDATE_CARRY);
+   }
+
+   // ANI data
+   // AND immediate with accumulator
+   0xe6 => {
+       state.accumulator = state.accumulator & opcode[1] as u8;
+       logic_flags(state);
+   }
+   
+   // XRI data
+   // XOR immediate with accumulator
+   0xee => {
+       state.accumulator = state.accumulator ^ opcode[1] as u8;
+       logic_flags(state);
+   }
+   // ORI data
+   // OR immediate with accumulator
+    0xf6 => {
+       state.accumulator = state.accumulator | opcode[1] as u8;
+       logic_flags(state);
+   }
+
+   // CPI Data
+   // compare immediate with accumulator
+    0xfe => {
+        let rhs = opcode[1];
+        subtract_byte(state, state.accumulator, rhs, CARRY::UPDATE_CARRY);
+   }
+
+
+
+
+
+   
+
+
 
     // STAX B
     // store the contents of accumulator to  
@@ -316,7 +381,7 @@ fn arithmetic_flag(state: &mut Processor8085, res: u16, carry: CARRY)  {
     }
     state.flag.zero = res & 0xff == 0;
     //128 in hex
-    state.flag.sign = 0x80 == res & 0x80;
+    state.flag.sign = 0x80 == (res & 0x80);
     // lower bit or MSB
     state.flag.parity = check_parity((res & 0xff) as u8, 8);
 }
