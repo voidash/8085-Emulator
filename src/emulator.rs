@@ -7,7 +7,7 @@
 // 8085 is little endian 
 
 use crate::core::{Processor8085,CARRY};
-use crate::utils::check_parity;
+use crate::utils::{check_parity, bool_to_bin};
 
 //returns program counter
 #[allow(unused_variables,unused_mut)]
@@ -548,6 +548,94 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut pc: usize)  -> usize {
     }
 
     
+    // PUSH portion
+    // push B
+    0xc5 => {
+        state.memory[(state.stack_pointer-1) as usize] = state.b;
+        state.memory[(state.stack_pointer-2) as usize] = state.c;
+        state.stack_pointer -= 2;
+    }
+    //PUSH D
+    0xd5 =>  {
+        state.memory[(state.stack_pointer-1) as usize] = state.d;
+        state.memory[(state.stack_pointer-2) as usize] = state.e;
+        state.stack_pointer -= 2;
+    }
+
+    //PUSH H
+    0xe5 =>  {
+        state.memory[(state.stack_pointer-1) as usize] = state.h;
+        state.memory[(state.stack_pointer-2) as usize] = state.l;
+        state.stack_pointer -= 2;
+    }
+
+    //PUSH PSW
+    0xf5 =>  {
+        let psw = bool_to_bin(state.flag.zero) |
+                  bool_to_bin(state.flag.sign) << 1 |
+                  bool_to_bin(state.flag.parity) << 2 |
+                  bool_to_bin(state.flag.carry) << 3 |
+                  bool_to_bin(state.flag.auxillary_carry) << 4;
+ 
+                state.memory[(state.stack_pointer-1) as usize] = state.accumulator;
+        state.memory[(state.stack_pointer-2) as usize] = psw;
+        state.stack_pointer -= 2;
+
+    }
+
+    // POP 
+    // POP B
+    0xc1 => {
+       state.b = state.memory[state.stack_pointer as usize] ;
+       state.c = state.memory[(state.stack_pointer + 1) as usize] ;
+       state.stack_pointer += 2;
+    }
+    // POP D
+    0xd1 => {
+       state.d = state.memory[state.stack_pointer as usize] ;
+       state.e = state.memory[(state.stack_pointer + 1) as usize] ;
+       state.stack_pointer += 2;
+
+    }
+    // POP H
+    0xe1 => {
+       state.h = state.memory[state.stack_pointer as usize] ;
+       state.l = state.memory[(state.stack_pointer + 1) as usize] ;
+       state.stack_pointer += 2;
+
+    }
+    // POP PSW
+    0xf1 => {
+        state.accumulator = state.memory[state.stack_pointer as usize];
+        let psw= state.memory[(state.stack_pointer + 1) as usize] ;
+        state.flag.zero = (0b00000001 & psw) == 1;
+        state.flag.sign = (0b00000010 & psw) == 0b10;
+        state.flag.parity = (0b00000100 & psw) == 0b100;
+        state.flag.carry = (0b00001000 & psw) == 0b1000;
+        state.flag.auxillary_carry = (0b00010000 & psw) == 0b10000;
+    } 
+
+    // XTHL
+    // H and L will hold contents of stack pointer
+    // stack pointer will hold the contents of H and L
+    // SWAP basically
+    0xe3 => {
+        let b_sp = state.memory[state.stack_pointer as usize];
+        //most significant bit stackpointer buffer
+        let b_sp_msb = state.memory[(state.stack_pointer+1) as usize];
+
+        state.memory[state.stack_pointer as usize] = state.l;
+        state.memory[(state.stack_pointer+1) as usize] = state.h;
+
+        state.l = b_sp;
+        state.h = b_sp_msb;
+
+    }
+    // SPHL
+    //store contents of H and L on Stack pointer
+    0xf9 => {
+        state.stack_pointer = ((state.h as u16) << 8) | state.l as u16;
+    }
 
     // STAX B
     // store the contents of accumulator to  

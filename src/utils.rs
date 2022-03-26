@@ -8,6 +8,14 @@ for i in 0..size {
     ones % 2 == 0
 }
 
+pub fn bool_to_bin(data:bool) -> u8{
+    if data == true {1} else {0}
+}
+
+pub fn bin_to_bool(data:u8) -> bool{
+    if data == 1 {true} else {false}
+}
+
 
 
 #[test]
