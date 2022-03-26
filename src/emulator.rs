@@ -374,6 +374,181 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut pc: usize)  -> usize {
         state.flag.carry = true;
     }
 
+    // INR portion
+
+
+    // INR B
+    0x04 => {
+        state.b += 1;
+    }
+    // INR C
+    0x0c => {
+        state.c += 1;
+    }
+    // INR D
+    0x14 => {
+        state.d +=1; 
+    }
+    // INR E
+    0x1c => {
+        state.e += 1;
+    } 
+    // INR H
+    0x24 => {
+        state.h += 1;
+    }
+    // INR L
+    0x2c => {
+        state.l += 1;
+    }
+    // INR M (H and L pair)
+    0x34 => {
+        let buffer: u16 = (state.h as u16) << 8 | state.l as u16;
+        state.memory[buffer as usize] = add_byte(state,state.memory[buffer as usize], 1, CARRY::PRESERVE_CARRY);
+    }
+    // INR A
+    0x3c => {
+        state.accumulator += 1;
+    }
+
+    // DCR portion
+
+   // DCR B
+    0x05 => {
+        state.b -= 1;
+    }
+    // DCR C
+    0x0d => {
+        state.c -= 1;
+    }
+    // DCR D
+    0x15 => {
+        state.d -=1; 
+    }
+    // DCR E
+    0x1d => {
+        state.e -= 1;
+    } 
+    // DCR H
+    0x25 => {
+        state.h -= 1;
+    }
+    // DCR L
+    0x2d => {
+        state.l -= 1;
+    }
+    // DCR M (H and L pair)
+    0x35 => {
+        let buffer: u16 = (state.h as u16) << 8 | state.l as u16;
+        state.memory[buffer as usize] = subtract_byte(state,state.memory[buffer as usize], 1, CARRY::PRESERVE_CARRY);
+    }
+    // DCR A
+    0x3d => {
+        state.accumulator -= 1;
+    }
+
+    // INX B
+    0x03 => {
+        state.c += 1;
+        if state.c == 0 {
+            state.b += 1;
+        }
+    }
+
+    // INX D
+    0x13 => {
+        state.d += 1;
+        if state.d == 0 {
+            state.e += 1;
+        }
+    }
+
+    // INX H
+    0x23 => {
+        state.h += 1;
+        if state.h  == 0 {
+            state.l += 1;
+        }
+    }
+
+    // INX SP
+    0x33 => {
+        state.stack_pointer+=1;
+    }
+    
+    // DCX B
+    0x0b => {
+        state.b -= 1;
+        if state.b  == 0 {
+            state.c -= 1;
+        }
+    }
+
+    // DCX D
+    0x1b => {
+        state.d -= 1;
+        if state.d  == 0 {
+            state.e -= 1;
+        }
+
+    }
+    // DCX H
+    0x2b => {
+        state.h -= 1;
+        if state.h  == 0 {
+            state.l -= 1;
+        }
+
+    }
+    // DCX SP
+    0x3b => {
+        state.stack_pointer -= 1;
+    }
+
+
+
+    // DAD (Double Register ADD)
+    // DAD B
+    0x09 => {
+        let hl_register_pair_buffer: u16 = (state.h as u16) << 8 | state.l as u16;
+        let bc_register_pair_buffer: u16 = (state.b as u16) << 8 | state.c as u16;
+
+        let result: u32 = hl_register_pair_buffer as u32 + bc_register_pair_buffer as u32;
+        state.h = ((result & 0xff00) >> 8) as u8;
+        state.l = (result & 0x00ff)  as u8;
+        state.flag.carry = if (result > 0xffff) {true} else {false};
+    }
+    // DAD D
+    0x19 => {
+        let hl_register_pair_buffer: u16 = (state.h as u16) << 8 | state.l as u16;
+        let de_register_pair_buffer: u16 = (state.d as u16) << 8 | state.e as u16;
+
+        let result: u32 = hl_register_pair_buffer as u32 + de_register_pair_buffer as u32;
+        state.h = ((result & 0xff00) >> 8) as u8;
+        state.l = (result & 0x00ff)  as u8;
+        state.flag.carry = if (result > 0xffff) {true} else {false};
+    }
+    // DAD H
+    0x29 => {
+        let hl_register_pair_buffer: u16 = (state.h as u16) << 8 | state.l as u16;
+
+        let result: u32 = hl_register_pair_buffer as u32 + hl_register_pair_buffer as u32;
+        state.h = ((result & 0xff00) >> 8) as u8;
+        state.l = (result & 0x00ff)  as u8;
+        state.flag.carry = if (result > 0xffff) {true} else {false};
+    }
+    // DAD SP
+    0x39 => {
+        let hl_register_pair_buffer: u16 = (state.h as u16) << 8 | state.l as u16;
+
+        let result: u32 = hl_register_pair_buffer as u32 + state.stack_pointer as u32;
+        state.h = ((result & 0xff00) >> 8) as u8;
+        state.l = (result & 0x00ff)  as u8;
+        state.flag.carry = if (result > 0xffff) {true} else {false};
+    }
+
+    
+
     // STAX B
     // store the contents of accumulator to  
     0x02 => {
