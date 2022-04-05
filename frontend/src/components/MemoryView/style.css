@@ -1,0 +1,32 @@
+.mem {
+  width:25vw;
+}
+
+.MemoryView {
+  border:1px solid black;
+}
+
+.MemoryBox {
+  display: flex;
+  font-size: 15px;
+  border-top: 1px solid;
+}
+
+.position {
+  background-color: gray;
+  padding:4px;
+}
+.value {
+  padding:4px;
+}
+.MemorySearch {
+  display: flex; 
+  justify-content: space-around;
+}
+
+.searchButton {
+  font-size: 20px;
+}
+.searchBar {
+  font-size: 30px;
+}
