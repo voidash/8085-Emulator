@@ -1,0 +1,17 @@
+.Register {
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid black;
+  width: 25vw;
+}
+.Register > div:first-child {
+  border: 1px solid black;
+  width: 100%;
+  text-align: center;
+  background-color: lightblue;
+}
+
+.RegisterPair {
+  display: flex;
+}

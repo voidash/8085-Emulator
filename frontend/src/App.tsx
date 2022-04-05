@@ -3,6 +3,8 @@ import logo from './logo.svg';
 import { useEffect } from 'react';
 
 import Editor, {useMonaco} from "@monaco-editor/react";
+import Flags from './components/flags';
+import Registers from './components/registers';
 
 
 function App() {
@@ -45,6 +47,8 @@ function App() {
 
   return (
     <div>
+      <Flags/>
+      <Registers/>
       <Editor
         height="90vh"
         width="50vw"
