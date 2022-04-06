@@ -20,11 +20,11 @@ export default function MemoryView() {
     <div className="MemorySearch">
       <input type="text" className="searchBar"/>
       <button className="searchButton">Search</button>
-    </div>
-      <div className="MemoryView">
+  </div>
+  <div className="MemoryView">
     <Memory position="0x22ff" value="0x33"/>
     <Memory position="0x22ff" value="0x33"/>
- </div>
+   </div>
 </div>);
 
 }

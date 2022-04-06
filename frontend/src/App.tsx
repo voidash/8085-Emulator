@@ -19,21 +19,22 @@ function App() {
   
 
   return (
-    <div>
-      <Flags/>
-      <Registers/>
-      <MemoryView/>
-
+    <div className="mainWindow">
       <Editor
         height="90vh"
-        width="50vw"
+        width="75vw"
         defaultLanguage="8085asm"
         defaultValue="; type here"
-        options = {{fontSize : 30,
+        options = {{fontSize : 20,
           minimap: {enabled: false}
         }}
         theme ="vs-dark"
       />
+      <div className="states">
+        <Flags/>
+        <Registers/>
+        <MemoryView/>
+      </div>
     </div>
   );
 }

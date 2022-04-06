@@ -1,5 +1,5 @@
 .mem {
-  width:25vw;
+  width:20vw;
 }
 
 .MemoryView {
@@ -19,14 +19,19 @@
 .value {
   padding:4px;
 }
+
 .MemorySearch {
   display: flex; 
-  justify-content: space-around;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
 }
 
 .searchButton {
+  border:none;
+  background: lightgreen;
   font-size: 20px;
 }
 .searchBar {
-  font-size: 30px;
+  width:20vw;
+  border:none;
 }

@@ -2,14 +2,15 @@ import './register_style.css'
 
 import {useState, useEffect} from 'react';
 
-interface Register{
+interface register{
   name: string,
-  value: number,
-  shouldHighlight: boolean
+  value: string,
+  shouldHighlight?: boolean,
+  sixteenBit?: boolean
 }
 
-let Register = ({name, value, shouldHighlight} : Register) => {
-  return (<div className="Register">
+let Register = ({name, value, shouldHighlight, sixteenBit} : register) => {
+  return (<div className={ sixteenBit? "Register16bit Register": "Register"} >
             <div>{name}</div>  
             <div>{value}</div>  
           </div>);
@@ -19,22 +20,28 @@ let Register = ({name, value, shouldHighlight} : Register) => {
 export default function Registers() { 
   return (
     <div>
+
+
+      <Register name="Accumulator" value ="0x00" sixteenBit={true}/>
       <div className="RegisterPair">
-          <Register name = "B" value = {22} shouldHighlight={false}/>
-          <Register name = "C" value = {34} shouldHighlight={false}/>
+          <Register name = "B" value = "0x00"/>
+          <Register name = "C" value = "0x00"/>
         </div>
 
       <div className="RegisterPair">
-          <Register name = "D" value = {22} shouldHighlight={false}/>
-          <Register name = "E" value = {34} shouldHighlight={false}/>
+          <Register name = "D" value = "0x00"/>
+          <Register name = "E" value = "0x00"/>
         </div>
 
       <div className="RegisterPair">
-          <Register name = "H" value = {22} shouldHighlight={false}/>
-          <Register name = "L" value = {34} shouldHighlight={false}/>
-        </div>
+          <Register name = "H" value = "0x00"/>
+          <Register name = "L" value = "0x00"/>
         </div>
 
+      <Register name="Stack Pointer" value="0x00" sixteenBit={true}/>
+      <Register name="Program Counter" value="0x00" sixteenBit={true}/>
+
+        </div>
 
   );
 }
