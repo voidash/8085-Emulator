@@ -1,1 +1,123 @@
-// add lalrpop file here
+use crate::assembler::utils;
+use crate::assembler::ast::{Op, Opcode};
+
+grammar;
+
+NonLabelledOpcode : Op = {
+	<a:Instruction> <b: Register> "," <c: Register> => Op::OpRR(String::from(a), String::from(b), String::from(c)) ,
+	<a:Instruction> <b: Register> "," <c: Literal> => Op::OpRA(String::from(a), String::from(b), c),
+	<a:Instruction> <b: Register> => Op::OpR(String::from(a), String::from(b)),
+	<a:Instruction> <b: Literal> =>Op::OpA(String::from(a), b), 
+	<a:Instruction> <b: Label> => Op::OpL(String::from(a), String::from(b)),
+	<a:Instruction> => Op::Op(String::from(a))
+
+}
+
+pub Opcode: Opcode = {
+	<a:Label> ":" <b:NonLabelledOpcode> => Opcode{Label: Some(String::from(a)), Op: b},
+	<a:NonLabelledOpcode> => Opcode{Label: None,Op: a } 
+}
+
+
+pub Instruction : &'input str = {
+	"di" => <>,
+	"sim" => <>,
+	"lhld" => <>,
+	"stc" => <>,
+	"aci" => <>,
+	"jnz" => <>,
+	"rm" => <>,
+	"mvi" => <>,
+	"rp" => <>,
+	"inr" => <>,
+	"hlt" => <>,
+	"rc" => <>,
+	"ani" => <>,
+	"xra" => <>,
+	"cc" => <>,
+	"nop" => <>,
+	"push" => <>,
+	"adc" => <>,
+	"add" => <>,
+	"ral" => <>,
+	"daa" => <>,
+	"rpe" => <>,
+	"cz" => <>,
+	"cmc" => <>,
+	"rst" => <>,
+	"xchg" => <>,
+	"rz" => <>,
+	"pop" => <>,
+	"jnc" => <>,
+	"rnc" => <>,
+	"rar" => <>,
+	"sta" => <>,
+	"rpo" => <>,
+	"xthl" => <>,
+	"call" => <>,
+	"cnc" => <>,
+	"in" => <>,
+	"cnz" => <>,
+	"dad" => <>,
+	"ei" => <>,
+	"mov" => <>,
+	"jmp" => <>,
+	"sbb" => <>,
+	"ora" => <>,
+	"pchl" => <>,
+	"ana" => <>,
+	"lda" => <>,
+	"sphl" => <>,
+	"cp" => <>,
+	"cma" => <>,
+	"cmp" => <>,
+	"xri" => <>,
+	"ori" => <>,
+	"cpi" => <>,
+	"jc" => <>,
+	"sub" => <>,
+	"dcr" => <>,
+	"cpe" => <>,
+	"rim" => <>,
+	"shld" => <>,
+	"cm" => <>,
+	"rrc" => <>,
+	"sbi" => <>,
+	"jpe" => <>,
+	"dcx" => <>,
+	"jz" => <>,
+	"rlc" => <>,
+	"ret" => <>,
+	"lxi" => <>,
+	"cpo" => <>,
+	"jpo" => <>,
+	"ldax" => <>,
+	"jp" => <>,
+	"inx" => <>,
+	"out" => <>,
+	"jm" => <>,
+	"sui" => <>,
+	"adi" => <>,
+	"stax" => <>,
+	"rnz" => <>
+}
+
+register: &'input str = r"[abcdehlmABCDEHLM]" => <>;
+pub Register: &'input str = {
+	register,
+	"sp" => <>,
+	"SP" => <>
+}
+
+
+//pub Hex: i32 = r"[0-9A-Fa-f]{1,4}[hH]" => utils::convert_8085_hex_to_i32(<>);
+pub Oct: i32 = r"[0-7]+[qQ]" => utils::convert_8085_oct_to_i32(<>);
+pub Dec: i32 = r"[0-9]+[dD]?" => utils::convert_8085_dec_to_i32(<>);
+
+pub Literal: i32 = {
+	Oct, 
+	Dec
+}
+
+pub Label: &'input str = r"[a-zA-Z][a-zA-Z0-9]+" => <>;
+
