@@ -48,7 +48,7 @@ fn test_fix_hexadecimal() {
 
 
 #[allow(unused_variables,unused_mut)]
-pub fn generate_assembly_code(assembled_code:Vec<String>) -> Vec<u8> {
+pub fn generate_assembly_code(lines:Vec<String>) -> Vec<u8> {
 
     let mut label_offset_map: HashMap<String, u32> = HashMap::new();
 

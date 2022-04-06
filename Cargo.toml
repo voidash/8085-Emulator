@@ -9,6 +9,7 @@ lalrpop = "0.19.7"
 
 [dependencies]
 regex = "1"
+clap = { version = "3.1.8", features = ["derive"] }
 
 [dependencies.lalrpop-util]
 version = "0.19.7"
