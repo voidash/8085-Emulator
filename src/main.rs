@@ -15,11 +15,14 @@ struct Args {
     interpreted: bool
 }
 
+fn read_from_file() {
+
+}
 
 fn main() {
     let args = Args::parse();
     let lines = vec![ 
-        "nop; genie niskyo",
+        "nop; Non arg line",
         "test: mvi a, 45h     ",
         "lda 3432h",
         "jmp test"
@@ -32,4 +35,5 @@ fn main() {
     generate_assembly_code(lines);
 
     println!("Hello {:?}",args);
+
 }

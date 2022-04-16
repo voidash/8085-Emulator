@@ -6,6 +6,17 @@ pub struct Flags {
     pub carry: bool,
     pub auxillary_carry: bool,
 }
+impl Flags {
+    pub fn new() -> Self {
+        Self {
+            zero: false,
+            sign: false,
+            parity: false,
+            carry: false,
+            auxillary_carry: false,
+        }
+    }
+}
 
 #[allow(dead_code)]
 pub struct Processor8085 {
@@ -20,6 +31,24 @@ pub struct Processor8085 {
     pub stack_pointer: u16,
     pub program_counter: u16,
     pub memory: Vec<u8>
+}
+
+impl Processor8085 {
+    pub fn new() -> Self {
+        Self {
+            accumulator: 0,
+            flag: Flags::new(),
+            b: 0,
+            c: 0,
+            d: 0,
+            e: 0,
+            h: 0,
+            l: 0,
+            stack_pointer: 0,
+            program_counter: 0,
+            memory: std::iter::repeat(0).take(1000000).collect()
+        }            
+    }
 }
 
 

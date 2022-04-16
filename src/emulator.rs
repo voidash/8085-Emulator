@@ -11,7 +11,7 @@ use crate::utils::{check_parity, bool_to_bin};
 
 //returns program counter
 #[allow(unused_variables,unused_mut)]
-pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> usize {
+pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16> {
 
     let mut cycles:  u8 = 4;
     // for single byte code the offset is just one pc + 1 = next state.memory
@@ -19,15 +19,328 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> usize {
 
     #[allow(unused_parens,unused_assignments)]
     match (state.memory[state.program_counter as usize]) {
+    //HLT
+    0x76 => {
+        // if pc is 5 then halt
+       return None;
+    }
     // NOP 
     0x00 => { 
        cycles = 0;
     }
-    
-    /* LXI portion */
+    /* MVI */ 
+    //MVI C, byte
+    0x0e => {
+        state.c = opcode[1];
+        state.program_counter += 1;
+    }
 
-    // LXI B, data
-    // load data into BC register pair immediate
+    //MVI D, byte
+    0x16 => {
+        state.d = opcode[1];
+        state.program_counter += 1;
+    }
+
+    //MVI E, byte
+    0x1e => {
+        state.e = opcode[1];
+        state.program_counter += 1;
+    }
+    //MVI H, byte
+    0x26 => {
+        state.c = opcode[1];
+        state.program_counter += 1;
+    }
+    //MVI L, byte
+    0x2e => {
+        state.c = opcode[1];
+        state.program_counter += 1;
+    }
+    //MVI M, byte
+    0x36 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.memory[position as usize] = opcode[1];
+        state.program_counter += 1;
+    }
+    // MVI A, byte
+    0x3e => {
+        state.c = opcode[1];
+        state.program_counter += 1;
+    }
+    /* MOV */
+    //MOV B, B
+    0x40 => {
+        state.b = state.b;
+    }
+    // MOV B, C
+    0x41 => {
+        state.b = state.c;
+    }
+    // MOV B, D
+    0x42 => {
+        state.b = state.d;
+    }
+    // MOV B, E
+    0x43 => {
+        state.b = state.e;
+    }
+    // MOV B, H
+    0x44 => {
+        state.b = state.h;
+    }
+    // MOV B, L
+    0x45 => {
+        state.b = state.l;
+    }
+    // MOV B, M
+    0x46 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.b = state.memory[position as usize];
+    }
+    // MOV B, A
+    0x47 => {
+        state.b = state.accumulator;
+    }
+
+    //MOV C, B
+    0x48 => {
+        state.c = state.b;
+    }
+    // MOV C, C
+    0x49 => {
+        state.c = state.c;
+    }
+    // MOV C, D 
+    0x4a => {
+        state.c = state.d;
+    }
+    // MOV C, E 
+    0x4b => {
+        state.c = state.e;
+    }
+    // MOV C, H
+    0x4c => {
+        state.c = state.h;
+    }
+    // MOV C, L
+    0x4d => {
+        state.c = state.l;
+    }
+    // MOV B, M
+    0x4e => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.c = state.memory[position as usize];
+    }
+    // MOV B, A
+    0x4f => {
+        state.c = state.accumulator;
+    }
+    //MOV D, B
+    0x50 => {
+        state.d = state.b;
+    }
+    // MOV D, C
+    0x51 => {
+        state.d = state.c;
+    }
+    // MOV D, D
+    0x52 => {
+        state.d = state.d;
+    }
+    // MOV D, E
+    0x53 => {
+        state.d = state.e;
+    }
+    // MOV D, H
+    0x54 => {
+        state.d = state.h;
+    }
+    // MOV D, L
+    0x55 => {
+        state.d = state.l;
+    }
+    // MOV D, M
+    0x56 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.d = state.memory[position as usize];
+    }
+    // MOV D, A
+    0x57 => {
+        state.d = state.accumulator;
+    }
+    //MOV E, B
+    0x58 => {
+        state.e = state.b;
+    }
+    // MOV E, C
+    0x59 => {
+        state.e = state.c;
+    }
+    // MOV E, D
+    0x5a => {
+        state.e = state.d;
+    }
+    // MOV E, E
+    0x5b => {
+        state.e = state.e;
+    }
+    // MOV E, H
+    0x5c => {
+        state.e = state.h;
+    }
+    // MOV E, L
+    0x5d => {
+        state.e = state.l;
+    }
+    // MOV E, M
+    0x5e => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.e = state.memory[position as usize];
+    }
+    // MOV E, A
+    0x5f => {
+        state.e = state.accumulator;
+    }
+    //MOV H, B
+    0x60 => {
+        state.h = state.b;
+    }
+    // MOV H, C
+    0x61 => {
+        state.h = state.c;
+    }
+    // MOV H, D
+    0x62 => {
+        state.h = state.d;
+    }
+    // MOV H, E
+    0x63 => {
+        state.h = state.e;
+    }
+    // MOV H, H
+    0x64 => {
+        state.h = state.h;
+    }
+    // MOV H, L
+    0x65 => {
+        state.h = state.l;
+    }
+    // MOV H, M
+    0x66 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.h = state.memory[position as usize];
+    }
+    // MOV H, A
+    0x67 => {
+        state.h = state.accumulator;
+    }
+
+    //MOV L, B
+    0x68 => {
+        state.l = state.b;
+    }
+    // MOV L, C
+    0x69 => {
+        state.l = state.c;
+    }
+    // MOV L, D
+    0x6a => {
+        state.l = state.d;
+    }
+    // MOV L, E
+    0x6b => {
+        state.l = state.e;
+    }
+    // MOV L, H
+    0x6c => {
+        state.l = state.h;
+    }
+    // MOV L, L
+    0x6d => {
+        state.l = state.l;
+    }
+    // MOV L, M
+    0x6e => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.l = state.memory[position as usize];
+    }
+    // MOV L, A
+    0x6f => {
+        state.l = state.accumulator;
+    }
+
+    //MOV A, B
+    0x78 => {
+        state.accumulator = state.b;
+    }
+    // MOV A, C
+    0x79 => {
+        state.accumulator = state.c;
+    }
+    // MOV A, D
+    0x7a => {
+        state.accumulator = state.d;
+    }
+    // MOV A, E
+    0x7b => {
+        state.accumulator = state.e;
+    }
+    // MOV A, H
+    0x7c => {
+        state.accumulator = state.h;
+    }
+    // MOV A, L
+    0x7d => {
+        state.accumulator = state.l;
+    }
+    // MOV A, M
+    0x7e => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.accumulator = state.memory[position as usize];
+    }
+    // MOV A, A
+    0x7f => {
+        state.accumulator = state.accumulator;
+    }
+
+    // MOV M, B
+    0x70 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.memory[position as usize ] = state.b;
+    }
+
+    // MOV M, C
+    0x71 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.memory[position as usize ] = state.c;
+    }
+    // MOV M, D
+    0x72 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.memory[position as usize ] = state.d;
+    }
+
+    // MOV M, E
+    0x73 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.memory[position as usize ] = state.e;
+    }
+
+    // MOV M, H
+    0x74 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.memory[position as usize ] = state.h;
+    }
+
+    // MOV M, L
+    0x75 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.memory[position as usize ] = state.l;
+    }
+
+    /* LXI portion */
+     
+    // LXI B, data load data into BC register pair immediate
     0x01 =>  { 
         // due to little endianess 4455 is divided into 55 44 
         // least significant byte comes first
@@ -656,6 +969,13 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> usize {
         state.program_counter = ((state.h as u16) << 8) | state.l as u16;
     }
 
+    // SHLD
+    0x22 => {
+        let position = ((opcode[2] as u16) << 8) | opcode[1] as u16;
+        state.memory[position as usize] = state.l;
+        state.memory[(position+1) as usize] = state.h;
+        state.program_counter += 2;
+    }
     // Jump portion
     // JMP 
     0xc3 => {
@@ -703,6 +1023,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> usize {
             state.program_counter += 2;
         }
     }
+
     // JP 
     // jump if sign flag is positive
     0xf2 => {
@@ -738,19 +1059,57 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> usize {
 
     }
 
-    // STAX B
-    // store the contents of accumulator to  
-    0x02 => {
-        //
+    // LDA word 
+    // load into accumulator 
+    0x3a => {
+        let position: u16 = ((opcode[2] as u16) << 8) | opcode[1] as u16;
+        state.accumulator = state.memory[position as usize];
+        state.program_counter += 2;
     }
+
+    // LDAX B 
+    0x0a => {
+        let position: u16 = ((state.b as u16) << 8) | state.c as u16;
+        state.accumulator = state.memory[position as usize];
+    }
+
+    // LDAX D 
+    0x1a => {
+        let position: u16 = ((state.d as u16) << 8) | state.e as u16;
+        state.accumulator = state.memory[position as usize];
+    }
+
+    //STA 
+    // store accumulator directly in memroy 
+    0x32 => {
+        let position: u16 = ((state.d as u16) << 8) | state.e as u16;
+        state.memory[position as usize] = state.accumulator;
+        state.program_counter += 2;
+    }    
+
+    // STAX B
+    // store the contents of accumulator to the location defined by STAX
+    0x02 => {
+        let position: u16 = ((state.b as u16) << 8) | state.c as u16;
+        state.memory[position as usize] = state.accumulator;
+    }
+    
+    // STAX B
+    // store the contents of accumulator to the location defined by STAX
+    0x12 => {
+        let position: u16 = ((state.d as u16) << 8) | state.e as u16;
+        state.memory[position as usize] = state.accumulator;
+    }
+
     _ => {
+        println!("unknown command");
         cycles = 0;
     }
 
     }
 
    state.program_counter += 1;
-   state.program_counter as usize
+   Some(state.program_counter as u16)
 }
 
 fn add_byte(state: &mut Processor8085, lhs: u8, rhs: u8, carry: CARRY) -> u8{

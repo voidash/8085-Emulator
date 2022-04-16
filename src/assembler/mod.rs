@@ -64,6 +64,19 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
             let reg2 = &register2[..];
 
             match(ins, reg1, reg2) {
+                ("mov", "a", x) => {
+                    match x {
+                        "b" => { assembled_vec.push(0x78); },
+                        "c" => { assembled_vec.push(0x79); },
+                        "d" => { assembled_vec.push(0x7A); },
+                        "e" => { assembled_vec.push(0x7B); },
+                        "h" => { assembled_vec.push(0x7C); },
+                        "l" => { assembled_vec.push(0x7D); },
+                        "m" => { assembled_vec.push(0x7E); },
+                        "a" => { assembled_vec.push(0x7F); },
+                        _ => { }
+                        }
+                    },
                 ("mov", "b", x) => {
                     match x {
                         "b" => { assembled_vec.push(0x40); },
