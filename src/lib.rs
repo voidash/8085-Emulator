@@ -55,7 +55,7 @@ pub fn generate_assembly_code(lines:Vec<String>) -> Vec<u8> {
     let mut line_number: u32 = 0;
     for line in lines {
        line_number += 1; 
-       let line = &fix_hexadecimal(remove_comments(line.trim()))[..];
+       let line = &fix_hexadecimal(remove_comments(line.trim().to_lowercase().as_str()))[..];
        println!("{}", line);
        match assembly::OpcodeParser::new().parse(line) {
            Ok(ops) => {
@@ -73,7 +73,7 @@ pub fn generate_assembly_code(lines:Vec<String>) -> Vec<u8> {
 
 #[test]
 fn test_if_assembly_generated() {
-    assert_eq!(generate_assembly_code(vec!["nop","trello: mvi c, 34h", "hello: mov b, c", "jz hello", "jnc trello"].iter().map(|&x| {String::from(x)}).collect()),vec![0, 14, 52, 65, 202, 3, 210, 2]);
+    assert_eq!(generate_assembly_code(vec!["nop","trello: mvi c, 34H", "hello: mov b, c", "jz hello", "jnc trello"].iter().map(|&x| {String::from(x)}).collect()),vec![0, 14, 52, 65, 202, 3, 210, 2]);
   assert_eq!(generate_assembly_code(vec!["mov a, b".to_string()]), vec![120]);
 }
 
@@ -90,9 +90,9 @@ fn check_emulation() {
     }
 
     while let Some(pc) = emulator::emulate_8085(&mut new_state, 0) {
-        println!("{}", pc);
+//        println!("{}", pc);
     }
-    println!("{}", new_state.accumulator);
-    println!("{}", new_state.c);
+ //   println!("{}", new_state.accumulator);
+  //  println!("{}", new_state.c);
 }
 

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>My Wasm Project</title>
+  </head>
+
+  <body>
+    <script type="module">
+      // Importing WASM as a JS module requires us to call an init function provided by the default export.
+      // This is planned to be changed in the future.
+      import * as wasm from "./pkg/wasm_8085.js";
+      wasm.default().then((module) => {
+				let emulator = new wasm.Emulator(0);
+        emulator.load_program(["mvi b, 25", "mov b, c", "add c"]);
+        console.log(emulator.watch_memory(0,10));
+        console.log(emulator.emulate_line_by_line());
+        console.log(emulator.b());
+      });
+
+    </script>
+  </body>
+</html>

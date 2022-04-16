@@ -1,7 +1,5 @@
 /*
- * Author=> { 8085 Project Team
- *
- *
+ * Author =>  8085 Project Team
  */
 
 // 8085 is little endian 
@@ -29,6 +27,12 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
        cycles = 0;
     }
     /* MVI */ 
+
+    //MVI B, byte
+    0x06 => {
+        state.b = opcode[1];
+        state.program_counter += 1;
+    }
     //MVI C, byte
     0x0e => {
         state.c = opcode[1];
@@ -48,12 +52,12 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     }
     //MVI H, byte
     0x26 => {
-        state.c = opcode[1];
+        state.h = opcode[1];
         state.program_counter += 1;
     }
     //MVI L, byte
     0x2e => {
-        state.c = opcode[1];
+        state.l = opcode[1];
         state.program_counter += 1;
     }
     //MVI M, byte
@@ -64,7 +68,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     }
     // MVI A, byte
     0x3e => {
-        state.c = opcode[1];
+        state.accumulator = opcode[1];
         state.program_counter += 1;
     }
     /* MOV */
