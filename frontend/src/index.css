@@ -22,3 +22,10 @@ code {
   flex-direction: column;
   align-items: center
 }
+
+.runDecorator{
+  background: darkolivegreen;
+}
+.errorDecorator {
+  background: red;
+}

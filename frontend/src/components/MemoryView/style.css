@@ -3,6 +3,8 @@
 }
 
 .MemoryView {
+  overflow-y: scroll;
+  height: 250px;
   border:1px solid black;
 }
 
@@ -14,6 +16,7 @@
 
 .position {
   background-color: gray;
+  min-width: 50px;
   padding:4px;
 }
 .value {
@@ -22,16 +25,22 @@
 
 .MemorySearch {
   display: flex; 
-  border-left: 1px solid black;
-  border-right: 1px solid black;
+  margin-bottom: 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .searchButton {
-  border:none;
   background: lightgreen;
-  font-size: 20px;
+  font-size: 15px;
+  padding: 5px;
+  border-radius:20px;
 }
 .searchBar {
-  width:20vw;
+  border-radius:20px;
+  background: lightpink;
+  width: 50px;
+  font-size: 15px;
   border:none;
 }
