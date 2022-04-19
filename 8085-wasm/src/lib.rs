@@ -81,14 +81,18 @@ impl Emulator {
     }
 
 
-    pub fn load_program(&mut self, data: Box<[JsValue]>){
+    pub fn load_program(&mut self,offset:usize, data: Box<[JsValue]>) -> usize{
        let start_address = self.offset;
        let formatted_data = data.iter().map(|s| { s.as_string().unwrap().to_lowercase() }).collect();
+
        let assembled_code = generate_assembly_code(formatted_data);
 
+       let mut position = start_address+offset;
        for (counter,&hex_code) in assembled_code.iter().enumerate() {
-           self.state.memory[start_address + counter]  = hex_code;
+           self.state.memory[start_address + offset + counter]  = hex_code;
+           position = position + counter;
        } 
+       position
     }
 
     pub fn watch_memory(&self, start: usize, stop : usize ) -> Box<[u8]> {
