@@ -15,8 +15,8 @@ import * as wasm from './wasm/wasm_8085';
 type CodeEditor = monaco.editor.IStandaloneCodeEditor;
 
 function App() {
-  let [line, setLine] = useState<number>(0);
-  let [programCounter, setProgramCounter] = useState<number>(0);
+  let [line, setLine] = useState<number>(1);
+  let [pcLineVec, setPcLineVec] = useState<Uint32Array>(new Uint32Array());
   let [code, setCode]  = useState<string[]>([]);
   let [loaded, setLoaded]  = useState<boolean>(false);
   let [decoration, setDecoration] = useState<string[] | undefined>();
@@ -76,21 +76,28 @@ function App() {
   }
 
   function debugMode() {
-      setLoaded(!loaded);
-      gotoLine(line+1);
-      let newPC = emulator?.load_program(programCounter,[code[line]]) as number;
-      setProgramCounter(newPC);
-      console.log(newPC + "is new program counter");
-      setLine(line + 1);
+    if(loaded) {
+
+      emulator?.emulate_line_by_line();
+      let val = pcLineVec.findIndex((val) => {
+        return emulator?.program_counter() as number == val;
+      });
+
+      setLine(val+1);
+      gotoLine(line);
+
+      console.log(line);
       stopDecoration();
+    }
   }
 
   function loadProgram() {
-
     //force update
+    setLine(0)
     loadEmulator(() => {
       setEmulator(new wasm.Emulator(0));
-      emulator?.load_program(0,code);
+      setPcLineVec(emulator?.load_program(0,code) as Uint32Array);
+      console.log(pcLineVec);
       emulator?.set_program_counter(0);
       setLoaded(true);
     });

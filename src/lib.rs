@@ -9,7 +9,6 @@ use assembler::utils::convert_8085_hex_to_i32;
 use assembler::assemble;
 use assembler::assembly;
 
-use crate::core::AssembledMeta;
 
 fn remove_comments(line: &str) -> &str{
     if let Some(index) = line.find(";") {
@@ -48,13 +47,13 @@ fn test_fix_hexadecimal() {
 
 
 #[allow(unused_variables,unused_mut)]
-pub fn generate_assembly_code(lines:Vec<String>) -> (Vec<u8>,Vec<AssembledMeta>) {
+pub fn generate_assembly_code(lines:Vec<String>) -> (Vec<u8>,Vec<usize>) {
 
     let mut label_offset_map: HashMap<String, u32> = HashMap::new();
 
 
     let mut assembly_code :Vec<u8> = Vec::new(); 
-    let mut assembled_metadata : Vec<AssembledMeta> = Vec::new();
+    let mut line_pc_vec: Vec<usize> = Vec::new();
     let mut line_number: u32 = 0;
 
     for line in lines {
@@ -65,26 +64,21 @@ pub fn generate_assembly_code(lines:Vec<String>) -> (Vec<u8>,Vec<AssembledMeta>)
        match assembly::OpcodeParser::new().parse(line) {
            Ok(ops) => {
                if let Some(l) = &ops.Label {
-                   label_offset_map.insert(l.clone(), line_number);
+                   label_offset_map.insert(l.clone(), assembly_code.len() as u32);
                }
-               let e_data = AssembledMeta {
-                   line_number : line_number as usize,
-                   start_position: assembly_code.len(),
-                   original_text : original_line 
-               };
                assembly_code.append(&mut assemble(ops, &label_offset_map));
-               assembled_metadata.push(e_data);
            },
             Err(_) => {println!("error");}
        }
+       line_pc_vec.push(assembly_code.len());
     }
-    (assembly_code,assembled_metadata)
+    (assembly_code,line_pc_vec)
 }
 
 
 #[test]
 fn test_if_assembly_generated() {
-    assert_eq!(generate_assembly_code(vec!["nop","trello: mvi c, 34H", "hello: mov b, c", "jz hello", "jnc trello"].iter().map(|&x| {String::from(x)}).collect()).0,vec![0, 14, 52, 65, 202, 3, 210, 2]);
+    assert_eq!(generate_assembly_code(vec!["nop","trello: mvi c, 34H", "hello: mov b, c", "jz hello", "jnc trello"].iter().map(|&x| {String::from(x)}).collect()).0,vec![0, 14, 52, 65, 202, 3, 210, 1]);
   assert_eq!(generate_assembly_code(vec!["mov a, b".to_string()]).0, vec![120]);
 }
 

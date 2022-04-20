@@ -75,24 +75,23 @@ impl Emulator {
     }
 
     pub fn assemble(&self,data: &str) -> Box<[u8]> {
-
-        let my_vec = generate_assembly_code(vec![String::from(data)]);
+        let (my_vec,_) = generate_assembly_code(vec![String::from(data)]);
         my_vec.into_boxed_slice()
     }
 
 
-    pub fn load_program(&mut self,offset:usize, data: Box<[JsValue]>) -> usize{
+    pub fn load_program(&mut self,offset:usize, data: Box<[JsValue]>) -> Box<[usize]>{
        let start_address = self.offset;
        let formatted_data = data.iter().map(|s| { s.as_string().unwrap().to_lowercase() }).collect();
 
-       let assembled_code = generate_assembly_code(formatted_data);
+       let (assembled_code,meta) = generate_assembly_code(formatted_data);
 
        let mut position = start_address+offset;
        for (counter,&hex_code) in assembled_code.iter().enumerate() {
            self.state.memory[start_address + offset + counter]  = hex_code;
            position = position + counter;
        } 
-       position
+       meta.into_boxed_slice()
     }
 
     pub fn watch_memory(&self, start: usize, stop : usize ) -> Box<[u8]> {
