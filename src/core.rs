@@ -51,6 +51,14 @@ impl Processor8085 {
     }
 }
 
+#[allow(dead_code)]
+#[derive(Clone,Debug)]
+pub struct AssembledMeta {
+    pub line_number: usize,
+    pub start_position : usize,
+    pub original_text: String
+}
+
 
 #[allow(dead_code,non_camel_case_types)]
 pub enum CARRY {
