@@ -124,8 +124,8 @@ function App() {
       <button onClick={() => loadProgram()}> Load Program</button>
       <button onClick={() => debugMode()}> Debug Mode</button>
       <button onClick={() => stopDecoration()}> Run Mode</button>
-        <Flags/>
-        <Registers/>
+        {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />};
+        {emulator == null ? "loading" : <Registers emulator={emulator as wasm.Emulator} />};
         {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={loaded}/>};
       </div>
     </div>

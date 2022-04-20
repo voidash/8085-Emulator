@@ -1,4 +1,7 @@
 import {useState, useEffect} from 'react';
+
+
+import * as wasm from '../../wasm/wasm_8085';
 import './style.css'
 
 interface flag {
@@ -14,7 +17,7 @@ let FlagCheckbox = ({name, state}: flag) => {
     </div>
   )
 }
-export default function Flags({}) {
+export default function Flags({emulator}: {emulator: wasm.Emulator}) {
   return (<div className="flags">
             <FlagCheckbox name ="Zero" state={false}/>
             <FlagCheckbox name ="Sign" state={false}/>
