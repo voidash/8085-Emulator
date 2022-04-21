@@ -14,16 +14,6 @@ code {
     monospace;
 }
 
-.mainWindow {
-  display:flex;
-  flex-wrap: wrap;
-}
-.states {
-  margin: 10px;
-  display:flex;
-  flex-direction: column;
-  align-items: center
-}
 
 .runDecorator{
   background: darkolivegreen;

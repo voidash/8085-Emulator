@@ -133,10 +133,13 @@ function App() {
   return (
 
     <div className="mainWindow">
-      <div className='runButtons'>
+      <Box display={'flex'} alignItems={'center'} justifyContent={'center'} py={2}>
         <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={{ xs: 1, sm: 2, md: 4 }}
+        flexDirection={'row'}
+          flexWrap={'wrap'}
+          gap={2}
+          alignItems={'center'}
+          justifyContent={'center'}
         >
           <Button variant="outlined" startIcon={<Build />} onClick={() => assemble()
           }>
@@ -149,9 +152,8 @@ function App() {
           </Button><Button variant="outlined" endIcon={<RunCircle />} onClick={() => runMode()}>
             Run Mode
           </Button>
-
         </Stack>
-      </div>
+      </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tabvalue} onChange={handleChange} centered>
           <Tab label="Code Editor" />
@@ -161,8 +163,8 @@ function App() {
       </Box>
       <TabPanel value={tabvalue} index={0}>
         <Editor
-          height="90vh"
-          width="65vw"
+          height="70vh"
+          width="100%"
           onChange={showValue}
           defaultLanguage="8085asm"
           defaultValue="; Type your code here"
@@ -175,17 +177,12 @@ function App() {
         />
       </TabPanel>
       <TabPanel value={tabvalue} index={1}>
-        <div className="states">
           {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />}
           {emulator == null ? "loading" : <Registers emulator={emulator as wasm.Emulator} />}
-
-        </div>
       </TabPanel>
       <TabPanel value={tabvalue} index={2}>
         {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={loaded} />}
       </TabPanel>
-
-
 
     </div>
   );

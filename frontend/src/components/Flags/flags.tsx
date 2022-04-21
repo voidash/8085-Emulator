@@ -1,29 +1,23 @@
-import {useState, useEffect} from 'react';
+import { Label } from '@mui/icons-material';
+import { Box, Checkbox, FormControlLabel, FormGroup } from '@mui/material';
+import { useState, useEffect } from 'react';
 
 
 import * as wasm from '../../wasm/wasm_8085';
 import './style.css'
 
-interface flag {
-  name: string, 
-  state: boolean
-}
 
-let FlagCheckbox = ({name, state}: flag) => {
+export default function Flags({ emulator }: { emulator: wasm.Emulator }) {
   return (
-    <div className="flagcheckboxes">
-      <div className="flagcheckbox_name">{name}</div>
-      <input type="checkbox" name="cbx" checked={state} className="flagcheckbox_checkbox"/>
-    </div>
+    <Box display={'flex'} flexDirection={'row'} flexWrap={'wrap'} justifyContent={'start'} alignItems={'center'} width="100%">
+      <h3 >Flag Registers Status:  </h3>
+      <Box width="20px"></Box>
+      <FormControlLabel control={<Checkbox checked={false} />} label="Zero" />
+      <FormControlLabel control={<Checkbox checked={false} />} label="Sign" />
+      <FormControlLabel control={<Checkbox checked={false} />} label="Parity" />
+      <FormControlLabel control={<Checkbox checked={false} />} label="Carry" />
+      <FormControlLabel control={<Checkbox checked={false} />} label="Aux Carry" />
+
+  </Box>
   )
 }
-export default function Flags({emulator}: {emulator: wasm.Emulator}) {
-  return (<div className="flags">
-            <FlagCheckbox name ="Zero" state={false}/>
-            <FlagCheckbox name ="Sign" state={false}/>
-            <FlagCheckbox name ="Parity" state={false}/>
-            <FlagCheckbox name ="Carry" state={false}/>
-            <FlagCheckbox name ="Aux Carry" state={false}/>
-          </div>)
-}
-
