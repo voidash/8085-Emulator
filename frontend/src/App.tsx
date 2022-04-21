@@ -12,10 +12,14 @@ import MemoryView from './components/MemoryView/memory_view';
 //wasm stuff
 import * as wasm from './wasm/wasm_8085';
 
+import {Log,LogType} from './utils/log';
+
 type CodeEditor = monaco.editor.IStandaloneCodeEditor;
+
 
 function App() {
   let [line, setLine] = useState<number>(1);
+  let [log, setLog]  = useState<Log>({type: LogType.NOTHING,LogString: "" })
   let [pcLineVec, setPcLineVec] = useState<Uint32Array>(new Uint32Array());
   let [code, setCode]  = useState<string[]>([]);
   let [loaded, setLoaded]  = useState<boolean>(false);
@@ -80,18 +84,22 @@ function App() {
 
       emulator?.emulate_line_by_line();
       let val = pcLineVec.findIndex((val) => {
-        return emulator?.program_counter() as number == val;
+        return emulator?.program_counter() as number === val;
       });
-
+    
+      console.log("val is " +val);
       setLine(val+1);
-      gotoLine(line);
-
-      console.log(line);
+      gotoLine(val+1);
       stopDecoration();
     }
   }
 
   function loadProgram() {
+    //check if program contains hlt at the end of the code otherwise issue warning 
+    if(!code[-1].toLowerCase().trim().startsWith("hlt")) {
+      setLog({type: LogType.WARNING, LogString : "You don't have hlt at the end of your code. When in Run mode the program might not finish at all"});
+    }
+     
     //force update
     setLine(0)
     loadEmulator(() => {
@@ -104,6 +112,11 @@ function App() {
     stopDecoration();
   }
 
+  function runMode() {
+      if(loaded) {
+        let c = emulator?.emulate();
+      }
+  }
 
   return (
     <div className="mainWindow">
@@ -123,10 +136,10 @@ function App() {
       <button onClick={() => assemble()}> Assemble</button>
       <button onClick={() => loadProgram()}> Load Program</button>
       <button onClick={() => debugMode()}> Debug Mode</button>
-      <button onClick={() => stopDecoration()}> Run Mode</button>
-        {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />};
-        {emulator == null ? "loading" : <Registers emulator={emulator as wasm.Emulator} />};
-        {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={loaded}/>};
+      <button onClick={() => runMode()}> Run Mode</button>
+        {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />}
+        {emulator == null ? "loading" : <Registers emulator={emulator as wasm.Emulator} />}
+        {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={loaded}/>}
       </div>
     </div>
   );

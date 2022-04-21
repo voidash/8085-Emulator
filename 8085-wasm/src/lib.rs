@@ -104,6 +104,14 @@ impl Emulator {
         }
         return 0;
     }
+
+    pub fn emulate(&mut self) -> u16{
+        while let Some(program_counter) = emulate_8085(&mut self.state, self.offset) {
+            return program_counter;
+        }
+        return 0;
+    }
+
 }
 
 
