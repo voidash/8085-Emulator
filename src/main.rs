@@ -15,6 +15,7 @@ struct Args {
     interpreted: bool
 }
 
+#[allow(dead_code)]
 fn read_from_file() {
 
 }

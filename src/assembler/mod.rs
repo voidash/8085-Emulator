@@ -509,6 +509,7 @@ fn opcode_check() {
     println!("{:?}",assemble(assembly::OpcodeParser::new().parse("add b").unwrap(), &label_offset_map));
 }
 
+#[allow(dead_code)]
 fn remove_comments(line: &str) -> &str{
     if let Some(index) = line.find(";") {
         return &line[..index];
@@ -516,6 +517,7 @@ fn remove_comments(line: &str) -> &str{
     line
 }
 
+#[allow(dead_code)]
 fn fix_hexadecimal(line: &str) -> String {
     if line.ends_with("h") {
         //find comma
