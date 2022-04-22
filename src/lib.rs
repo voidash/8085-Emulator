@@ -47,14 +47,14 @@ fn test_fix_hexadecimal() {
 
 
 #[allow(unused_variables,unused_mut)]
-pub fn generate_assembly_code(lines:Vec<String>) -> Result<(Vec<u8>,Vec<usize>),String> {
+pub fn generate_assembly_code(lines:Vec<String>) -> Result<(Vec<u8>,Vec<usize>),(usize, String)> {
 
     let mut label_offset_map: HashMap<String, u32> = HashMap::new();
 
 
     let mut assembly_code :Vec<u8> = Vec::new(); 
     let mut line_pc_vec: Vec<usize> = Vec::new();
-    let mut line_number: u32 = 0;
+    let mut line_number: usize = 0;
 
     for line in lines {
        let original_line = line.clone();
@@ -72,11 +72,15 @@ pub fn generate_assembly_code(lines:Vec<String>) -> Result<(Vec<u8>,Vec<usize>),
                        assembly_code.append(&mut code);
                    }
                    Err(error) => {
-                       return Err(error);
+                       return Err((line_number,error));
                    }
                }
            },
-            Err(_) => {println!("error");}
+           Err(_) => {
+               if !original_line.trim().starts_with(";") {
+                   return Err((line_number,format!("No such instruction exists: {}",line)));
+               }
+           }
        }
        line_pc_vec.push(assembly_code.len());
     }

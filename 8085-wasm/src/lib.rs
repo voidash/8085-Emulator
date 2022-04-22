@@ -74,24 +74,30 @@ impl Emulator {
         self.state.program_counter = offset;
     }
 
-    pub fn assemble(&self,data: &str) -> Box<[u8]> {
-        let (my_vec,_) = generate_assembly_code(vec![String::from(data)]);
-        my_vec.into_boxed_slice()
-    }
+//    pub fn assemble(&self,data: &str) -> Box<[u8]> {
+       // generate_assembly_code(vec![String::from(data)]);
+       // my_vec.into_boxed_slice()
+ //   }
 
-
-    pub fn load_program(&mut self,offset:usize, data: Box<[JsValue]>) -> Box<[usize]>{
+    pub fn load_program(&mut self,offset:usize, data: Box<[JsValue]>) -> Result<Box<[usize]>, JsValue> {
        let start_address = self.offset;
        let formatted_data = data.iter().map(|s| { s.as_string().unwrap().to_lowercase() }).collect();
 
-       let (assembled_code,meta) = generate_assembly_code(formatted_data);
-
-       let mut position = start_address+offset;
-       for (counter,&hex_code) in assembled_code.iter().enumerate() {
-           self.state.memory[start_address + offset + counter]  = hex_code;
-           position = position + counter;
-       } 
-       meta.into_boxed_slice()
+       match generate_assembly_code(formatted_data) {
+           Ok(data) =>{
+               let (assembled_code,meta) = data;
+               let mut position = start_address+offset;
+               for (counter,&hex_code) in assembled_code.iter().enumerate() {
+                   self.state.memory[start_address + offset + counter]  = hex_code;
+                   position = position + counter;
+               } 
+               return Ok(meta.into_boxed_slice());
+           } 
+           Err(error_signal) => {
+            let error = JsValue::from(format!("{linenumber}; {error}", linenumber=error_signal.0, error=error_signal.1));
+           return Err(error);
+           }
+       }
     }
 
     pub fn watch_memory(&self, start: usize, stop : usize ) -> Box<[u8]> {

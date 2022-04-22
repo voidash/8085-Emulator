@@ -83,8 +83,35 @@ function App() {
       }
     }]));
   }
+
+
+  function showWarning(linenumber: number, errorString: string) {
+    monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-warning', [{
+      startLineNumber: linenumber,
+      startColumn: 1,
+      endLineNumber: 2,
+      endColumn: 1000,
+      message: errorString,
+      severity: monaco.MarkerSeverity.Warning
+  }])
+  }
+
+  function showError(linenumber: number, errorString: string) {
+    monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-error', [{
+      startLineNumber: linenumber,
+      startColumn: 1,
+      endLineNumber: 2,
+      endColumn: 1000,
+      message: errorString,
+      severity: monaco.MarkerSeverity.Error
+  }])
+  }
+
+
   function stopDecoration() {
     editorRef.current?.deltaDecorations(decoration as string[], []);
+    monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-warning', [])
+    monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-error', [])
   }
 
   function assemble() {
@@ -99,7 +126,6 @@ function App() {
         return emulator?.program_counter() as number === val;
       });
 
-      console.log("val is " + val);
       setLine(val + 1);
       gotoLine(val + 1);
       stopDecoration();
@@ -116,8 +142,21 @@ function App() {
     setLine(0)
     loadEmulator(() => {
       setEmulator(new wasm.Emulator(0));
-      setPcLineVec(emulator?.load_program(0, code) as Uint32Array);
-      console.log(pcLineVec);
+      try {
+        let programCounterToLineNumberMapping = emulator?.load_program(0, code) as Uint32Array;
+        setPcLineVec(programCounterToLineNumberMapping);
+
+        if (code.filter(opcode => opcode.trim().toLowerCase() == "hlt").length == 0) {
+          showWarning(code.length,"Program doesn't contain hlt instruction. Program might not halt. Hint: add HLT instruction");
+        }
+      } catch(err: any) {
+        let error = err.split(";");
+        let lineNumber = parseInt(error);
+        let errorString = error[1];
+
+        showError(lineNumber, errorString);
+      }
+
       emulator?.set_program_counter(0);
       setLoaded(true);
     });
@@ -170,18 +209,21 @@ function App() {
           defaultValue="; Type your code here"
           options={{
             fontSize: 20,
-            minimap: { enabled: false }
+            /*minimap: { enabled: false }*/
+            minimap: {scale: 2}
           }}
           theme="vs-dark"
           onMount={handleEditorDidMount}
         />
-      </TabPanel>
-      <TabPanel value={tabvalue} index={1}>
+
           {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />}
           {emulator == null ? "loading" : <Registers emulator={emulator as wasm.Emulator} />}
+          {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={loaded} />}
+
+      </TabPanel>
+      <TabPanel value={tabvalue} index={1}>
       </TabPanel>
       <TabPanel value={tabvalue} index={2}>
-        {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={loaded} />}
       </TabPanel>
 
     </div>
