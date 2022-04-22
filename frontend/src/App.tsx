@@ -1,25 +1,19 @@
 import { useRef, useState } from 'react';
 import { useEffect } from 'react';
-// monaco stuff
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Range } from 'monaco-editor/esm/vs/editor/editor.api';
-import Editor, { Monaco, useMonaco } from "@monaco-editor/react";
 
 import Flags from './components/Flags/flags';
 import Registers from './components/Register/registers';
-import EightOEightFiveDefinition from './monaco/languageDefinition';
 import MemoryView from './components/MemoryView/memory_view';
 //wasm stuff
 import * as wasm from './wasm/wasm_8085';
 
 import { Log, LogType } from './utils/log';
-import { Box, Button, Stack, Tab, Tabs, } from '@mui/material';
-import SendIcon from '@mui/icons-material/ThreeDRotation';
+import { Box, Button, Collapse, Stack, Tab, Tabs, } from '@mui/material';
 import { BugReport, Build, RunCircle, SimCardDownload } from '@mui/icons-material';
 import { TabPanel } from './components/TabPanel/tab_panel';
-
-type CodeEditor = monaco.editor.IStandaloneCodeEditor;
-
+import { useSnackbar } from 'notistack';
+import CodeEditor from './components/Editor/editor';
 
 function App() {
 
@@ -38,7 +32,7 @@ function App() {
   let [decoration, setDecoration] = useState<string[] | undefined>();
   let [emulator, setEmulator] = useState<wasm.Emulator | null>(null);
   const editorRef = useRef<CodeEditor | null>(null);
-  const monaco = useMonaco();
+  const { enqueueSnackbar } = useSnackbar();
 
   //load emulator
 
@@ -55,19 +49,8 @@ function App() {
     });
   }, []);
 
-  // load monaco
-  useEffect(() => {
-    if (monaco) {
-      monaco.languages.register({ id: '8085asm' });
-      monaco.languages.setMonarchTokensProvider('8085asm', EightOEightFiveDefinition());
-    }
-  }, [monaco]);
 
-  function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor, _: Monaco) {
-    editorRef.current = editor;
-  }
-
-  function showValue() {
+  var showValue = () => {
     setLoaded(false);
     let codeBuffer: String = editorRef.current?.getValue() as String;
     setCode(codeBuffer.split("\n"));
@@ -120,6 +103,15 @@ function App() {
       console.log(pcLineVec);
       emulator?.set_program_counter(0);
       setLoaded(true);
+      enqueueSnackbar('Program Loaded', {
+        variant: 'success',
+        TransitionComponent: Collapse,
+        anchorOrigin: {
+          vertical: 'bottom',
+          horizontal: 'center',
+        }
+      });
+
     });
     stopDecoration();
   }
@@ -135,7 +127,7 @@ function App() {
     <div className="mainWindow">
       <Box display={'flex'} alignItems={'center'} justifyContent={'center'} py={2}>
         <Stack
-        flexDirection={'row'}
+          flexDirection={'row'}
           flexWrap={'wrap'}
           gap={2}
           alignItems={'center'}
@@ -145,8 +137,8 @@ function App() {
           }>
             Assemble
           </Button>
-          <Button variant="outlined" startIcon={< SimCardDownload />} onClick={() => loadProgram()}>
-            Load Program
+          <Button variant={loaded ? "contained" : "outlined"} startIcon={< SimCardDownload />} onClick={() => loadProgram()}>
+            {loaded ? "Loaded" : "Load Program"}
           </Button><Button variant="outlined" endIcon={<BugReport />} onClick={() => debugMode()}>
             Debug Mode
           </Button><Button variant="outlined" endIcon={<RunCircle />} onClick={() => runMode()}>
@@ -162,23 +154,11 @@ function App() {
         </Tabs>
       </Box>
       <TabPanel value={tabvalue} index={0}>
-        <Editor
-          height="70vh"
-          width="100%"
-          onChange={showValue}
-          defaultLanguage="8085asm"
-          defaultValue="; Type your code here"
-          options={{
-            fontSize: 20,
-            minimap: { enabled: false }
-          }}
-          theme="vs-dark"
-          onMount={handleEditorDidMount}
-        />
+        <CodeEditor onChange={showValue} />
       </TabPanel>
       <TabPanel value={tabvalue} index={1}>
-          {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />}
-          {emulator == null ? "loading" : <Registers emulator={emulator as wasm.Emulator} />}
+        {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />}
+        {emulator == null ? "loading" : <Registers emulator={emulator as wasm.Emulator} />}
       </TabPanel>
       <TabPanel value={tabvalue} index={2}>
         {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={loaded} />}
