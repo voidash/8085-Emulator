@@ -47,14 +47,14 @@ fn test_fix_hexadecimal() {
 
 
 #[allow(unused_variables,unused_mut)]
-pub fn generate_assembly_code(lines:Vec<String>) -> (Vec<u8>,Vec<usize>) {
+pub fn generate_assembly_code(lines:Vec<String>) -> Result<(Vec<u8>,Vec<usize>),(usize, String)> {
 
     let mut label_offset_map: HashMap<String, u32> = HashMap::new();
 
 
     let mut assembly_code :Vec<u8> = Vec::new(); 
     let mut line_pc_vec: Vec<usize> = Vec::new();
-    let mut line_number: u32 = 0;
+    let mut line_number: usize = 0;
 
     for line in lines {
        let original_line = line.clone();
@@ -66,20 +66,32 @@ pub fn generate_assembly_code(lines:Vec<String>) -> (Vec<u8>,Vec<usize>) {
                if let Some(l) = &ops.Label {
                    label_offset_map.insert(l.clone(), assembly_code.len() as u32);
                }
-               assembly_code.append(&mut assemble(ops, &label_offset_map));
+               let assembled_code = assemble(ops, &label_offset_map);
+               match assembled_code {
+                   Ok(mut code) => {
+                       assembly_code.append(&mut code);
+                   }
+                   Err(error) => {
+                       return Err((line_number,error));
+                   }
+               }
            },
-            Err(_) => {println!("error");}
+           Err(_) => {
+               if !original_line.trim().starts_with(";") {
+                   return Err((line_number,format!("No such instruction exists: {}",line)));
+               }
+           }
        }
        line_pc_vec.push(assembly_code.len());
     }
-    (assembly_code,line_pc_vec)
+    Ok((assembly_code,line_pc_vec))
 }
 
 
 #[test]
 fn test_if_assembly_generated() {
-    assert_eq!(generate_assembly_code(vec!["nop","trello: mvi c, 34H", "hello: mov b, c", "jz hello", "jnc trello"].iter().map(|&x| {String::from(x)}).collect()).0,vec![0, 14, 52, 65, 202, 3, 210, 1]);
-  assert_eq!(generate_assembly_code(vec!["mov a, b".to_string()]).0, vec![120]);
+    assert_eq!(generate_assembly_code(vec!["nop","trello: mvi c, 34H", "hello: mov b, c", "jz hello", "jnc trello"].iter().map(|&x| {String::from(x)}).collect()).unwrap().0,vec![0, 14, 52, 65, 202, 3, 210, 1]);
+  assert_eq!(generate_assembly_code(vec!["mov a, b".to_string()]).unwrap().0, vec![120]);
 }
 
 #[test]
@@ -89,7 +101,7 @@ fn check_emulation() {
     let mut new_state = core::Processor8085::new();
     new_state.program_counter = 0;
 
-    let (assembled_val,meta) = generate_assembly_code(prog); 
+    let (assembled_val,meta) = generate_assembly_code(prog).unwrap(); 
     for (counter,&opcode) in assembled_val.iter().enumerate() {
         new_state.memory[counter] = opcode;
     }
