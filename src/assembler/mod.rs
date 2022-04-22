@@ -6,7 +6,7 @@ use ast::{Opcode, Op};
 use utils::convert_8085_hex_to_i32;
 use std::collections::HashMap;
 
-pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> Vec<u8> {
+pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> Result<Vec<u8>,String> {
     let mut assembled_vec:Vec<u8> = Vec::new(); 
 
     match parsed_line.Op {
@@ -23,7 +23,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                     "jm" => {assembled_vec.push(0xfa);},
                     "jpe" => {assembled_vec.push(0xea);},
                     "jpo" => {assembled_vec.push(0xe2);},
-                    _ => {}
+                    _ => {
+                        return Err(format!("{} not is one of the instruction jc, jmp , jnc, jz, jnz, jp, jm, jpe or jpo, that takes <opcode> <label> ",ins));
+                    }
                 }
                 assembled_vec.push(*offset as u8);
             }
@@ -55,7 +57,10 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                 "sphl" => {assembled_vec.push(0xf9);},
                 "ei" => {assembled_vec.push(0xfb);},
                 "hlt" => {assembled_vec.push(0x76);},
-                _ => {}
+                _ => {
+
+                        return Err(format!("{} not is one of the instruction that takes <opcode>. ",ins));
+                }
             }
         },
         Op::OpRR(instruction,register1, register2 ) => {
@@ -74,7 +79,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x7D); },
                         "m" => { assembled_vec.push(0x7E); },
                         "a" => { assembled_vec.push(0x7F); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("mov a, {} isn't supported. Supported Registers are b,c,d,e,h,l,m and a", x));
+                        }
                         }
                     },
                 ("mov", "b", x) => {
@@ -87,7 +94,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x45); },
                         "m" => { assembled_vec.push(0x46); },
                         "a" => { assembled_vec.push(0x47); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("mov b, {} isn't supported. Supported Registers are b,c,d,e,h,l,m and a", x));
+                        }
                         }
                     },
                 ("mov", "c", x) => {
@@ -100,7 +109,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x4d); },
                         "m" => { assembled_vec.push(0x4e); },
                         "a" => { assembled_vec.push(0x4f); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("mov c, {} isn't supported. Supported Registers are b,c,d,e,h,l,m and a", x));
+                        }
                         }
                     },
                 ("mov", "d", x) => {
@@ -113,7 +124,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x55); },
                         "m" => { assembled_vec.push(0x56); },
                         "a" => { assembled_vec.push(0x57); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("mov d, {} isn't supported. Supported Registers are b,c,d,e,h,l,m and a", x));
+                        }
                         }
                 },
                 ("mov", "e", x) => {
@@ -126,7 +139,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x5d); },
                         "m" => { assembled_vec.push(0x5e); },
                         "a" => { assembled_vec.push(0x5f); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("mov e, {} isn't supported. Supported Registers are b,c,d,e,h,l,m and a", x));
+                        }
                         }
                     },
                 ("mov", "h", x) => {
@@ -139,7 +154,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x65); },
                         "m" => { assembled_vec.push(0x66); },
                         "a" => { assembled_vec.push(0x67); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("mov h, {} isn't supported. Supported Registers are b,c,d,e,h,l,m and a", x));
+                        }
                         }
                     },
                 ("mov", "l", x) => {
@@ -152,7 +169,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x6d); },
                         "m" => { assembled_vec.push(0x6e); },
                         "a" => { assembled_vec.push(0x6f); },
-                        _ => { }
+                        _ => { 
+                            return Err(format!("mov l, {} isn't supported. Supported Registers are b,c,d,e,h,l,m and a", x));
+                        }
                         }
                 },
                 ("mov", "m", x) => {
@@ -164,10 +183,14 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "h" => { assembled_vec.push(0x74); },
                         "l" => { assembled_vec.push(0x75); },
                         "a" => { assembled_vec.push(0x77); },
-                        _ => { }
+                        _ => { 
+                            return Err(format!("mov m, {} isn't supported. Supported Registers are b,c,d,e,h,l,m and a", x));
+                        }
                         }
                 },
-                (_,_,_) => {}
+                (_,_,_) => {
+                            return Err(format!("{} {}, {} doesn't exist. Perhaps you meant mov r, r; Supported registers are b,c,d,e,h,l,m and a",ins, reg1, reg2));
+                }
             }
         },
         Op::OpRA(instruction, register, address) => {
@@ -184,7 +207,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "d" => { assembled_vec.push(0x11); },
                         "h" => { assembled_vec.push(0x21); },
                         "sp" => { assembled_vec.push(0x31); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("lxi {} doesn't exist. Supported register pair  are b, d, h , sp ",r));
+                        }
                     }
                     assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec());
                 },
@@ -198,12 +223,14 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x2e); },
                         "m" => { assembled_vec.push(0x36); },
                         "a" => { assembled_vec.push(0x3e); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("mvi {} doesn't exist. Supported registers  are b,c,d,e,h,l,m and a ",r));
+                        }
                     }
                     assembled_vec.push(a_u8);
                 },
                 (_,_) => {
-
+                            return Err(format!("{} {} doesn't exist. Perhaps you meant : mvi register, {value}  or lxi registerpair, {value}",ins, register,value = address));
                 }
             }
         },
@@ -270,7 +297,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                     assembled_vec.push(0xc3);
                     assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec());
                 },
-                _ => {} }
+                _ => {
+                    return Err(format!("{} {} doesn't exist. perhaps you meant to use jmp, cpo, jpo, sta, lda, adi, aci,ori or cpi ",ins,address));
+                } }
         },
         Op::OpR(instruction, register) => {
             let ins = &instruction[..];
@@ -285,7 +314,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "h" => { assembled_vec.push(0x24); },
                         "l" => { assembled_vec.push(0x2c); },
                         "m" => { assembled_vec.push(0x34); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("inr {} doesn't exist. perhaps you meant to increment b,c,d,e,h,l or m",a));
+                        }
                     }
                 },
                 ("dcr", a) => {
@@ -297,7 +328,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "h" => { assembled_vec.push(0x24); },
                         "l" => { assembled_vec.push(0x2d); },
                         "m" => { assembled_vec.push(0x35); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("dcr {} doesn't exist. perhaps you meant to decrement b,c,d,e,h,l or m",a));
+                        }
                     }
                 },
                 ("inx", a) => {
@@ -306,7 +339,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "d" => { assembled_vec.push(0x13); },
                         "h" => { assembled_vec.push(0x23); },
                         "sp" => { assembled_vec.push(0x33); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("inx {} doesn't exist. perhaps you meant to increment register pair b, d, h or sp",a));
+                        }
                     }
                 },
                 ("dcx", a) => {
@@ -315,7 +350,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "d" => { assembled_vec.push(0x1b); },
                         "h" => { assembled_vec.push(0x2b); },
                         "sp" => { assembled_vec.push(0x3b); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("dcx {} doesn't exist. perhaps you meant to decrement register pair b, d, h or sp",a));
+                        }
                     }
                 },
                 ("add", a) => {
@@ -328,7 +365,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x85); },
                         "m" => { assembled_vec.push(0x86); },
                         "a" => { assembled_vec.push(0x87); },
-                        _ => { }
+                        _ => { 
+                            return Err(format!("add only supports registers b,c,d,e,h,l,m and a. It doesn't support register {}",a));
+                        }
                     }
                 },
                 ("sub", a) => {
@@ -341,7 +380,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x95); },
                         "m" => { assembled_vec.push(0x96); },
                         "a" => { assembled_vec.push(0x97); },
-                        _ => { }
+                        _ => { 
+                            return Err(format!("sub only supports registers b,c,d,e,h,l,m and a. It doesn't support register {}",a));
+                        }
                     }
                 },
                 ("adc", a) => {
@@ -354,7 +395,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x8d); },
                         "m" => { assembled_vec.push(0x8e); },
                         "a" => { assembled_vec.push(0x8f); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("adc only supports registers b,c,d,e,h,l,m and a. It doesn't support register {}",a));
+                        }
                     }
                 },
                 ("sbb", a) => {
@@ -367,7 +410,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0x9d); },
                         "m" => { assembled_vec.push(0x9e); },
                         "a" => { assembled_vec.push(0x9f); },
-                        _ => { }
+                        _ => { 
+                            return Err(format!("sbb only supports registers b,c,d,e,h,l,m and a. It doesn't support register {}",a));
+                        }
                     }
                 },
                 ("ana", a) => {
@@ -380,7 +425,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0xa5); },
                         "m" => { assembled_vec.push(0xa6); },
                         "a" => { assembled_vec.push(0xa7); },
-                        _ => { }
+                        _ => { 
+                            return Err(format!("ana only supports registers b,c,d,e,h,l,m and a. It doesn't support register {}",a));
+                        }
                     }
                 },
                 ("xra", a) => {
@@ -393,7 +440,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0xad); },
                         "m" => { assembled_vec.push(0xae); },
                         "a" => { assembled_vec.push(0xaf); },
-                        _ => { }
+                        _ => { 
+                            return Err(format!("xra only supports registers b,c,d,e,h,l,m and a. It doesn't support register {}",a));
+                        }
                     }
                 },
                 ("ora", a) => {
@@ -406,7 +455,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0xb5); },
                         "m" => { assembled_vec.push(0xb6); },
                         "a" => { assembled_vec.push(0xb7); },
-                        _ => { }
+                        _ => { 
+                            return Err(format!("ora only supports registers b,c,d,e,h,l,m and a. It doesn't support register {}",a));
+                        }
                     }
                 },
                 ("cmp", a) => {
@@ -419,21 +470,28 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "l" => { assembled_vec.push(0xbd); },
                         "m" => { assembled_vec.push(0xbe); },
                         "a" => { assembled_vec.push(0xbf); },
-                        _ => { }
+                        _ => { 
+                            return Err(format!("cmp only supports registers b,c,d,e,h,l,m and a. It doesn't support register {}",a));
+                                                        
+                        }
                     }
                 },
                 ("stax", a) => {
                     match a {
                         "b" => { assembled_vec.push(0x02); },
                         "d" => { assembled_vec.push(0x12); },
-                        _ => { }
+                        _ => { 
+                            return Err(format!("stax only supports registers pair b and d. It doesn't support register {}",a));
+                        }
                     }
                 },
                 ("ldax", a) => {
                     match a {
                         "b" => { assembled_vec.push(0x0a); },
                         "d" => { assembled_vec.push(0x1a); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("ldax only supports register pair b and d. It doesn't support register {}",a));
+                        }
                     }
                 },
 
@@ -443,7 +501,9 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "d" => { assembled_vec.push(0xd5); },
                         "h" => { assembled_vec.push(0xe5); },
                         "psw" => { assembled_vec.push(0xf5); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("push only supports registers pair b,d, h and psw. It doesn't support register {}",a));
+                        }
                     }
                 },
                 ("pop", a) => {
@@ -452,14 +512,18 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                         "d" => { assembled_vec.push(0xd1); },
                         "h" => { assembled_vec.push(0xe1); },
                         "psw" => { assembled_vec.push(0xf1); },
-                        _ => { }
+                        _ => {
+                            return Err(format!("pop only supports registers pair b,d, h and psw. It doesn't support register {}",a));
+                        }
                     }
                 },
-                (_,_) => {}
+                (_,_) => {
+                    return Err(format!("{ins} {register} isn't supported. supported instructions for this format are immediate opcodes such as adi , sbi, ani, xri, cpi, push and pop etc",ins=ins, register=register));
+                }
             }
         }
     }
-    assembled_vec
+    Ok(assembled_vec)
 }
 
 
