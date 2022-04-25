@@ -21,21 +21,24 @@ pub fn bin_to_bool(data:u8) -> bool{
 pub fn print_8085_state(state: &Processor8085) -> String{ 
     let output_string  =  format!(
         r#" 
+
 |-------------|-------------|
-|b: {:x}      | c: {:x}     | 
+|accumulator: {:<4x}    | 
 |-------------|-------------|
-|d: {:x}      | e: {:x}     | 
+|b: {:<4x}      | c: {:<4x}     | 
 |-------------|-------------|
-|h: {:x}      | l: {:x}     | 
+|d: {:<4x}      | e: {:<4x}     | 
 |-------------|-------------|
-|stack pointer:  {:x}       | 
+|h: {:<4x}      | l: {:<4x}     | 
 |-------------|-------------|
-|program counter:  {:x}     | 
+|stack pointer:  {:<4x}       | 
+|-------------|-------------|
+|program counter:  {:<4x}     | 
 |-------------|-------------|
 |s: {},z:{},AC:{},P:{},CY:{}| 
 |-------------|-------------|
         "#
-    ,state.b, state.c, state.d, state.e, state.h, state.l, state.stack_pointer, state.program_counter
+    ,state.accumulator,state.b, state.c, state.d, state.e, state.h, state.l, state.stack_pointer, state.program_counter
     , state.flag.sign, state.flag.zero, state.flag.auxillary_carry, state.flag.parity, state.flag.carry);
 
     output_string
