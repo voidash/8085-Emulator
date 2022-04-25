@@ -76,7 +76,7 @@ pub fn generate_assembly_code(lines:Vec<String>) -> Result<(Vec<u8>,Vec<usize>),
                    }
                }
            },
-           Err(_) => {
+           Err(x) => {
                if !original_line.trim().starts_with(";") {
                    return Err((line_number,format!("No such instruction exists: {}",line)));
                }

@@ -6,8 +6,8 @@
 // 8085 is little endian 
 
 
-pub fn disassemble_data(codebuffer : Vec<u8> ,program_counter: usize) -> (String, u8) {
-    let mut opcode_bytes: u8 = 1;
+pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, usize) {
+    let mut opcode_bytes: usize = 1;
     let mut equivalent_instruction = String::new(); 
 
     #[allow(unused_parens)]
@@ -15,7 +15,7 @@ pub fn disassemble_data(codebuffer : Vec<u8> ,program_counter: usize) -> (String
     0x00 => {
         equivalent_instruction =  format!("NOP");
     }
-     0x01 => {
+    0x01 => {
         equivalent_instruction = format!("LXI  B, {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
@@ -32,7 +32,7 @@ pub fn disassemble_data(codebuffer : Vec<u8> ,program_counter: usize) -> (String
 		equivalent_instruction = format!("DCR    B");
 		}
 	 0x06 => {
-		equivalent_instruction = format!("MVI    B,{:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("MVI    B,{:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0x07 => {
