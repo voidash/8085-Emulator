@@ -4,10 +4,12 @@ pub mod disassember;
 pub mod utils;
 pub mod assembler;
 
+
 use std::collections::HashMap;
 use assembler::utils::convert_8085_hex_to_i32;
 use assembler::assemble;
 use assembler::assembly;
+use regex::Regex;
 
 
 fn remove_comments(line: &str) -> &str{
@@ -18,7 +20,8 @@ fn remove_comments(line: &str) -> &str{
 }
 
 fn fix_hexadecimal(line: &str) -> String {
-    if line.ends_with("h") {
+    let re = Regex::new(r"[0-9]h").unwrap();
+    if re.is_match(line){
         //find comma
         if let Some(decimal_start_pos) = line.rfind(" ") {
              let d: i32 = convert_8085_hex_to_i32(&line[decimal_start_pos..line.len()].trim());

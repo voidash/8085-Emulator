@@ -17,7 +17,6 @@ use emulator::disassember::disassemble_data;
 
 //use utils::print_8085_state;
 use std::fs::File;
-use std::io::prelude::*;
 
 
 // for interpreted mode
@@ -172,7 +171,6 @@ fn main() {
         new_state.program_counter = 0;
 
         let mut memory_position = 0;
-        let mut prev_memory_position = 0;
         loop {
             let input = prompt("8085 Prompt > ");
             match input.as_str() {
@@ -180,7 +178,7 @@ fn main() {
                     println!("{}", print_8085_state(&new_state));
                 },
                 _ => {
-                    prev_memory_position = memory_position;
+                    let prev_memory_position = memory_position;
                     match generate_assembly_code(vec![input]) {
                         Ok((read_contents,_)) => {
                         for &opcode in read_contents.iter(){
@@ -192,7 +190,7 @@ fn main() {
                         println!("{:?}", read_contents);
                         },
                         Err(err) => {
-                            println!("{:?}", err.1);
+                            println!("{:?}", err);
                         }
                     }
                 }

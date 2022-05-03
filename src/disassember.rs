@@ -16,7 +16,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
         equivalent_instruction =  format!("NOP");
     }
     0x01 => {
-        equivalent_instruction = format!("LXI  B, {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+        equivalent_instruction = format!("LXI  B, {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0x02 => {
@@ -57,7 +57,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("DCR    C");
 		}
 	 0x0e => {
-		equivalent_instruction = format!("MVI    C,{:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("MVI    C,{:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0x0f => {
@@ -68,7 +68,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("NOP");
 		}
 	 0x11 => {
-		equivalent_instruction = format!("LXI    D,{:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("LXI    D,{:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0x12 => {
@@ -84,7 +84,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("DCR    D");
 		}
 	 0x16 => {
-		equivalent_instruction = format!("MVI    D,{:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("MVI    D,{:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0x17 => {
@@ -109,7 +109,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("DCR    E");
 		}
 	 0x1e => {
-		equivalent_instruction = format!("MVI    E,{:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("MVI    E,{:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0x1f => {
@@ -120,11 +120,11 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("NOP");
 		}
 	 0x21 => {
-		equivalent_instruction = format!("LXI    H,{:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("LXI    H,{:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0x22 => {
-		equivalent_instruction = format!("SHLD   {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("SHLD   {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0x23 => {
@@ -137,7 +137,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("DCR    H");
 		}
 	 0x26 => {
-		equivalent_instruction = format!("MVI    H,{:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("MVI    H,{:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0x27 => {
@@ -150,7 +150,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("DAD    H");
 		}
 	 0x2a => {
-		equivalent_instruction = format!("LHLD   {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("LHLD   {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0x2b => {
@@ -163,7 +163,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("DCR    L");
 		}
 	 0x2e => {
-		equivalent_instruction = format!("MVI    L,{:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("MVI    L,{:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0x2f => {
@@ -174,11 +174,11 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("NOP");
 		}
 	 0x31 => {
-		equivalent_instruction = format!("LXI    SP,{:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("LXI    SP,{:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0x32 => {
-		equivalent_instruction = format!("STA    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("STA    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0x33 => {
@@ -191,7 +191,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("DCR    M");
 		}
 	 0x36 => {
-		equivalent_instruction = format!("MVI    M,{:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("MVI    M,{:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0x37 => {
@@ -204,7 +204,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("DAD    SP");
 		}
 	 0x3a => {
-		equivalent_instruction = format!("LDA    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("LDA    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0x3b => {
@@ -217,7 +217,7 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("DCR    A");
 		}
 	 0x3e => {
-		equivalent_instruction = format!("MVI    A,{:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("MVI    A,{:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0x3f => {
@@ -623,22 +623,22 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("POP    B");
 		}
 	 0xc2 => {
-		equivalent_instruction = format!("JNZ    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("JNZ    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xc3 => {
-		equivalent_instruction = format!("JMP    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("JMP    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xc4 => {
-		equivalent_instruction = format!("CNZ    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CNZ    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xc5 => {
 		equivalent_instruction = format!("PUSH   B");
 		}
 	 0xc6 => {
-		equivalent_instruction = format!("ADI    {:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("ADI    {:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0xc7 => {
@@ -651,23 +651,23 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("RET");
 		}
 	 0xca => {
-		equivalent_instruction = format!("JZ     {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("JZ     {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xcb => {
-		equivalent_instruction = format!("JMP    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("JMP    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xcc => {
-		equivalent_instruction = format!("CZ     {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CZ     {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xcd => {
-		equivalent_instruction = format!("CALL   {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CALL   {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xce => {
-		equivalent_instruction = format!("ACI    {:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("ACI    {:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0xcf => {
@@ -681,22 +681,22 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("POP    D");
 		}
 	 0xd2 => {
-		equivalent_instruction = format!("JNC    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("JNC    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xd3 => {
-		equivalent_instruction = format!("OUT    {:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("OUT    {:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0xd4 => {
-		equivalent_instruction = format!("CNC    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CNC    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xd5 => {
 		equivalent_instruction = format!("PUSH   D");
 		}
 	 0xd6 => {
-		equivalent_instruction = format!("SUI    {:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("SUI    {:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0xd7 => {
@@ -709,23 +709,23 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("RET");
 		}
 	 0xda => {
-		equivalent_instruction = format!("JC     {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("JC     {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xdb => {
-		equivalent_instruction = format!("IN     {:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("IN     {:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0xdc => {
-		equivalent_instruction = format!("CC     {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CC     {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xdd => {
-		equivalent_instruction = format!("CALL   {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CALL   {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xde => {
-		equivalent_instruction = format!("SBI    {:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("SBI    {:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0xdf => {
@@ -739,21 +739,21 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("POP    H");
 		}
 	 0xe2 => {
-		equivalent_instruction = format!("JPO    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("JPO    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xe3 => {
 		equivalent_instruction = format!("XTHL");
 		}
 	 0xe4 => {
-		equivalent_instruction = format!("CPO    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CPO    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xe5 => {
 		equivalent_instruction = format!("PUSH   H");
 		}
 	 0xe6 => {
-		equivalent_instruction = format!("ANI    {:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("ANI    {:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0xe7 => {
@@ -766,22 +766,22 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("PCHL");
 		}
 	 0xea => {
-		equivalent_instruction = format!("JPE    {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("JPE    {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xeb => {
 		equivalent_instruction = format!("XCHG");
 		}
 	 0xec => {
-		equivalent_instruction = format!("CPE     {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CPE     {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xed => {
-		equivalent_instruction = format!("CALL   {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CALL   {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xee => {
-		equivalent_instruction = format!("XRI    {:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("XRI    {:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0xef => {
@@ -795,21 +795,21 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("POP    PSW");
 		}
 	 0xf2 => {
-		equivalent_instruction = format!("JP     {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("JP     {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xf3 => {
 		equivalent_instruction = format!("DI");
 		}
 	 0xf4 => {
-		equivalent_instruction = format!("CP     {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CP     {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xf5 => {
 		equivalent_instruction = format!("PUSH   PSW");
 		}
 	 0xf6 => {
-		equivalent_instruction = format!("ORI    {:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("ORI    {:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
 	 0xf7 => {
@@ -822,22 +822,22 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 		equivalent_instruction = format!("SPHL");
 		}
 	 0xfa => {
-		equivalent_instruction = format!("JM     {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("JM     {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xfb => {
 		equivalent_instruction = format!("EI");
 		}
 	 0xfc => {
-		equivalent_instruction = format!("CM     {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CM     {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xfd => {
-		equivalent_instruction = format!("CALL  {:02x}{:02x}", codebuffer[program_counter+2], codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CALL  {:02x}{:02x}h", codebuffer[program_counter+2], codebuffer[program_counter+1]);
 		opcode_bytes = 3;
 		}
 	 0xfe => {
-		equivalent_instruction = format!("CPI    {:02x}", codebuffer[program_counter+1]);
+		equivalent_instruction = format!("CPI    {:02x}h", codebuffer[program_counter+1]);
 		opcode_bytes = 2;
 		}
     _ => {
