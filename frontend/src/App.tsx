@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import { Range } from 'monaco-editor/esm/vs/editor/editor.api';
 
 import Flags from './components/Flags/flags';
 import Registers from './components/Register/registers';
@@ -29,7 +27,6 @@ function App() {
     let [pcLineVec, setPcLineVec] = useState<Uint32Array>(new Uint32Array());
 
     let [loaded, setLoaded] = useState<boolean>(false);
-    let [decoration, setDecoration] = useState<string[] | undefined>();
     let [emulator, setEmulator] = useState<wasm.Emulator | null>(null);
     const editorRef = useRef<CodeEditor | null>(null);
     const { enqueueSnackbar } = useSnackbar();
@@ -51,65 +48,43 @@ function App() {
     }, []);
 
 
-
-
-    function gotoLine(linenumber: number) {
-        editorRef.current?.setPosition({ column: 1, lineNumber: linenumber });
-        setDecoration(editorRef.current?.deltaDecorations([], [{
-            range: new Range(linenumber, 1, linenumber, 40),
-            options: {
-                isWholeLine: true,
-                className: 'runDecorator'
-            }
-        }]));
-    }
-
-
-    function showWarning(linenumber: number, errorString: string) {
-        monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-warning', [{
-            startLineNumber: linenumber,
-            startColumn: 1,
-            endLineNumber: 2,
-            endColumn: 1000,
-            message: errorString,
-            severity: monaco.MarkerSeverity.Warning
-        }])
-    }
-
-    function showError(linenumber: number, errorString: string) {
-        monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-error', [{
-            startLineNumber: linenumber,
-            startColumn: 1,
-            endLineNumber: 2,
-            endColumn: 1000,
-            message: errorString,
-            severity: monaco.MarkerSeverity.Error
-        }])
-    }
-
-
-    function stopDecoration() {
-        editorRef.current?.deltaDecorations(decoration as string[], []);
-        monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-warning', [])
-        monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-error', [])
-    }
-
-    function assemble() {
-
-    }
-
     function debugMode() {
         if (loaded) {
-
             emulator?.emulate_line_by_line();
             let val = pcLineVec.findIndex((val) => {
                 return emulator?.program_counter() as number === val;
             });
 
             setLine(val + 1);
-            gotoLine(val + 1);
-            stopDecoration();
+            var newLine = val + 1;
+            localStorage.setItem("lineToHighlight", newLine.toString());
+            window.dispatchEvent(new Event('highlightChange'));
+        } else {
+            enqueueSnackbar('Please load program first.', {
+                variant: 'warning',
+                TransitionComponent: Collapse,
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }
+            });
         }
+    }
+
+    function showWarning(linenumber: number, errorString: string) {
+        localStorage.setItem("8085-warning", JSON.stringify({
+            "line": linenumber,
+            "message": errorString,
+        }));
+        window.dispatchEvent(new Event("8085-warning"));
+    }
+
+    function showError(linenumber: number, errorString: string) {
+        localStorage.setItem("8085-error", JSON.stringify({
+            "line": linenumber,
+            "message": errorString,
+        }));
+        window.dispatchEvent(new Event("8085-error"));
     }
 
     function loadProgram() {
@@ -143,7 +118,13 @@ function App() {
             });
 
         });
-        stopDecoration();
+        localStorage.removeItem("8085-error");
+        localStorage.removeItem("8085-warning");
+        localStorage.removeItem("lineToHighlight");
+        window.dispatchEvent(new Event("8085-error"));
+        window.dispatchEvent(new Event("8085-warning"));
+        window.dispatchEvent(new Event("highlightChange"));
+
     }
 
     function runMode() {
@@ -151,6 +132,12 @@ function App() {
             let c = emulator?.emulate();
         }
     }
+
+
+    function assemble() {
+
+    }
+
 
     return (
 
