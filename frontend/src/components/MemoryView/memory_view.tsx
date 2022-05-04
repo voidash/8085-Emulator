@@ -60,7 +60,7 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
           <Box sx={{
             margin: 0.3,
             padding: 0,
-            width: 60,
+            width: 80,
             borderRadius: 0.5,
             backgroundColor: 'primary.dark',
             '&:hover': {
@@ -70,7 +70,8 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
           }}>
             <Box sx={{
               textAlign: 'center',
-              fontSize: 10,
+              fontSize: 14,
+              padding: 1,
               backgroundColor: 'primary.light',
 
             }}>
@@ -78,9 +79,10 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
             </Box>
             <Box sx={{
               textAlign: 'center',
-              fontSize: 14,
+              fontSize: 18,
               color: "white",
-              padding: 0.5,
+
+              padding: 2,
             }} >
               {s == 0 ? "‎" : "0x" + s.toString(16)}
             </Box>

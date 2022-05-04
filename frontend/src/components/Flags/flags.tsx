@@ -17,7 +17,6 @@ export default function Flags({ emulator }: { emulator: wasm.Emulator }) {
       <FormControlLabel control={<Checkbox checked={false} />} label="Parity" />
       <FormControlLabel control={<Checkbox checked={false} />} label="Carry" />
       <FormControlLabel control={<Checkbox checked={false} />} label="Aux Carry" />
-
-  </Box>
+    </Box>
   )
 }
