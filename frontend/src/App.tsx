@@ -6,7 +6,7 @@ import Registers from './components/Register/registers';
 import * as wasm from './wasm/wasm_8085';
 
 import { Log, LogType } from './utils/log';
-import { Box, Button, Collapse, Stack, Tab, Tabs, } from '@mui/material';
+import { Box, Button, Chip, Collapse, Divider, Stack, Tab, Tabs, } from '@mui/material';
 import { BugReport, Build, RunCircle, SimCardDownload } from '@mui/icons-material';
 import { TabPanel } from './components/TabPanel/tab_panel';
 import { useSnackbar } from 'notistack';
@@ -164,25 +164,43 @@ function App() {
                     </Button>
                 </Stack>
             </Box>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={tabvalue} onChange={handleChange} centered>
-                    <Tab label="Code Editor" />
-                    <Tab label="Flag & Register" />
-                    <Tab label="Memory" />
-                </Tabs>
-            </Box>
-            <TabPanel value={tabvalue} index={0}>
-                <CodeEditor changeHandler={() => { setLoaded(false) }} />
-            </TabPanel>
-            <TabPanel value={tabvalue} index={1}>
-                {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />}
-                {emulator == null ? "loading" : <Registers emulator={emulator as wasm.Emulator} />}
-            </TabPanel>
-            <TabPanel value={tabvalue} index={2}>
+            <Box className='desktopView'>
+                <Box display={"flex"} justifyContent={"space-between"}>
+                    <Box className='editor'>
+                        <CodeEditor changeHandler={() => { setLoaded(false) }} />
+                    </Box>
+                    <Box className='information'>
+                        {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />}
+                        {emulator == null ? "loading" : <Registers emulator={emulator as wasm.Emulator} />}
+                    </Box>
+                </Box>
+                <Box height="30px"></Box>
+                <Divider>
+                    <Chip label="Memory View" />
+                </Divider>
                 {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={false} />}
-            </TabPanel>
+            </Box>
+            <Box className='mobileView'>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Tabs value={tabvalue} onChange={handleChange} centered>
+                        <Tab label="Code Editor" />
+                        <Tab label="Flag & Register" />
+                        <Tab label="Memory" />
+                    </Tabs>
+                </Box>
+                <TabPanel value={tabvalue} index={0}>
+                    <CodeEditor changeHandler={() => { setLoaded(false) }} />
+                </TabPanel>
+                <TabPanel value={tabvalue} index={1}>
+                    {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />}
+                    {emulator == null ? "loading" : <Registers emulator={emulator as wasm.Emulator} />}
+                </TabPanel>
+                <TabPanel value={tabvalue} index={2}>
+                    {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={false} />}
+                </TabPanel>
+            </Box>
 
-        </div>
+        </div >
     );
 }
 

@@ -1,5 +1,3 @@
-
-
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -14,10 +12,43 @@ code {
     monospace;
 }
 
+.editor {
+  width: 63%;
+}
 
-.runDecorator{
+.information {
+  width: 35%;
+}
+
+.runDecorator {
   background: darkolivegreen;
 }
+
 .errorDecorator {
   background: red;
+}
+
+.desktopView {
+  flex-direction: row;
+  padding: 30px;
+}
+
+@media only screen and (min-width: 768px) {
+  .desktopView {
+    display: block;
+  }
+
+  .mobileView {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .desktopView {
+    display: none;
+  }
+
+  .mobileView {
+    display: block;
+  }
 }

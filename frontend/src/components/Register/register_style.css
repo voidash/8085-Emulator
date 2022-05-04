@@ -39,3 +39,16 @@
   border-left: 1px solid black;
 
 }
+
+@media only screen and (min-width: 768px) {
+  .Register>div:nth-child(2) {
+    padding: 6px;
+    font-size: 1rem;
+  }
+
+  .Register>div:first-child {
+    font-weight: bolder;
+    font-size: 1.2rem;
+    padding: 6px;
+  }
+}
