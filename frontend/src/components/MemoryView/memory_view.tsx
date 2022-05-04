@@ -2,20 +2,7 @@ import { useState, useEffect } from 'react';
 import './style.css';
 
 import * as wasm from '../../wasm/wasm_8085';
-
-interface memory {
-  position: string,
-  value: string
-};
-
-let Memory = ({ position, value }: memory) => {
-  return (
-    <div className="MemoryBox">
-      <div className="position">{position}</div>
-      <div className="value">{value}</div>
-    </div>
-  )
-}
+import { Box, List, TextField } from '@mui/material';
 
 
 export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulator, loaded: boolean }) {
@@ -45,26 +32,63 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
     }
   }, [loaded, startAddr, stopAddr]);
 
-  //TODO: check if start is greater then stop
-  //TODO: show error if that happens
   return (
-    <div className="mem">
-      <h3>{loaded ? "program is loaded" : "program not loaded"}</h3>
+    <Box sx={{
+      margin: "auto"
+    }}>
+      <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} py={2}>
+        <TextField error={strToNumber(startAddr) >= strToNumber(stopAddr)} helperText={strToNumber(startAddr) >= strToNumber(stopAddr) ? "Start can't be greater than stop." : ""} label="Start" variant="filled" inputProps={{ inputMode: 'numeric', }} onChange={(e) => {
+          if (e.target.value.trim() == "") {
+            setStartAddr('0');
+          } else {
 
-      <div className="MemorySearch">
-        <span>start  </span>
-        <input type="text" className="searchBar" onChange={(e) => setStartAddr(e.target.value)} />
-        <span>stop </span>
-        <input type="text" className="searchBar" onChange={(e) => setStopAddr(e.target.value)} />
-        <button className="searchButton">Set Memory space</button>
-      </div>
+            setStartAddr(e.target.value);
+          }
+        }} />
+        <TextField error={strToNumber(startAddr) >= strToNumber(stopAddr)} helperText={strToNumber(startAddr) >= strToNumber(stopAddr) ? "Stop can't be smaller than start." : ""} label="Stop" variant="filled" inputProps={{ inputMode: 'numeric', }} onChange={(e) => {
+          if (e.target.value.trim() == "") {
+            setStopAddr('300');
+          } else {
 
-      <div className="MemoryView">
+            setStopAddr(e.target.value);
+          }
+        }} />
+      </Box>
+
+      <List className='memoryView'>
         {data.map((s, i) => (
-          <Memory key={i} position={"0x" + (i + strToNumber(startAddr)).toString(16)} value={"0x" + s.toString(16)} />
+          <Box sx={{
+            margin: 0.3,
+            padding: 0,
+            width: 60,
+            borderRadius: 0.5,
+            backgroundColor: 'primary.dark',
+            '&:hover': {
+              backgroundColor: 'primary.main',
+              opacity: [0.9, 0.8, 0.7],
+            },
+          }}>
+            <Box sx={{
+              textAlign: 'center',
+              fontSize: 10,
+              backgroundColor: 'primary.light',
+
+            }}>
+              {"0x" + (i + strToNumber(startAddr)).toString(16)}
+            </Box>
+            <Box sx={{
+              textAlign: 'center',
+              fontSize: 14,
+              color: "white",
+              padding: 0.5,
+            }} >
+              {s == 0 ? "‎" : "0x" + s.toString(16)}
+            </Box>
+          </Box>
         ))}
-      </div>
-    </div>);
+      </List>
+    </Box >
+  );
 
 }
 

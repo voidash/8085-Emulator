@@ -1,16 +1,24 @@
 import Editor, { Monaco, useMonaco } from "@monaco-editor/react";
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import EightOEightFiveDefinition from "../../monaco/languageDefinition";
 
 type CodeEditor = monaco.editor.IStandaloneCodeEditor;
 
-function CodeEditor({ onChange }: { onChange: () => void }) {
+function CodeEditor({ changeHandler }: { changeHandler: () => void }) {
     const editorRef = useRef<CodeEditor | null>(null);
     const monaco = useMonaco();
+    let [code, setCode] = useState<string[]>([]);
 
     function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor, _: Monaco) {
         editorRef.current = editor;
+    }
+
+    var onChange = () => {
+        let codeBuffer: String = editorRef.current?.getValue() as String;
+        setCode(codeBuffer.split("\n"));
+        localStorage.setItem("code", codeBuffer.toString());
+        changeHandler();
     }
 
     useEffect(() => {
@@ -20,8 +28,10 @@ function CodeEditor({ onChange }: { onChange: () => void }) {
         }
     }, [monaco]);
 
+
     return (
         <Editor
+            value={localStorage.getItem("code") ?? "; Type Your Code Here"}
             height="70vh"
             width="100%"
             onChange={onChange}

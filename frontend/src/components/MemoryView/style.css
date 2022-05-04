@@ -1,46 +1,7 @@
-.mem {
-  width:20vw;
-}
-
-.MemoryView {
-  overflow-y: scroll;
-  height: 250px;
-  border:1px solid black;
-}
-
-.MemoryBox {
-  display: flex;
-  font-size: 15px;
-  border-top: 1px solid;
-}
-
-.position {
-  background-color: gray;
-  min-width: 50px;
-  padding:4px;
-}
-.value {
-  padding:4px;
-}
-
-.MemorySearch {
-  display: flex; 
-  margin-bottom: 10px;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
-.searchButton {
-  background: lightgreen;
-  font-size: 15px;
-  padding: 5px;
-  border-radius:20px;
-}
-.searchBar {
-  border-radius:20px;
-  background: lightpink;
-  width: 50px;
-  font-size: 15px;
-  border:none;
+.memoryView {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: justify;
+    justify-content: space-between;
 }
