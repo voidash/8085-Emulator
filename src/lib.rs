@@ -112,9 +112,7 @@ fn check_emulation() {
     println!("{:?}", meta);
 
     while let Some(pc) = emulator::emulate_8085(&mut new_state, 0) {
-//        println!("{}", pc);
+        
     }
- //   println!("{}", new_state.accumulator);
-  //  println!("{}", new_state.c);
 }
 

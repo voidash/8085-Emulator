@@ -58,6 +58,10 @@ impl Emulator {
         self.state.l
     }
 
+    pub fn flags(&self) -> Box<[u8]>  {
+        vec![self.state.flag.zero as u8, self.state.flag.sign as u8, self.state.flag.parity as u8, self.state.flag.carry as u8 ,self.state.flag.auxillary_carry as u8].into_boxed_slice()
+    }
+
     pub fn accumulator(&self) -> u8 {
         self.state.accumulator
     }

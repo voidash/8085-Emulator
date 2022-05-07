@@ -10,10 +10,9 @@ use crate::utils::{check_parity, bool_to_bin};
 //returns program counter
 #[allow(unused_variables,unused_mut)]
 pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16> {
-
     let mut cycles:  u8 = 4;
     // for single byte code the offset is just one pc + 1 = next state.memory
-    let mut opcode = &state.memory[state.program_counter as usize..];
+    let mut opcode = &state.memory[(state.program_counter) as usize..];
 
     #[allow(unused_parens,unused_assignments)]
     match (state.memory[state.program_counter as usize]) {
@@ -394,25 +393,26 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     }
 
     // SUB portion
-   0x8f=> { // SUB B
-        state.accumulator = subtract_byte(state, state.accumulator, state.b, CARRY::UPDATE_CARRY);
+   0x90=> { // SUB B
+        let test = subtract_byte(state, state.accumulator, state.b, CARRY::UPDATE_CARRY);
+        state.accumulator = test;
+        println!("{}", test);
 		}
-	 0x90=> { // SUB C
+	 0x91=> { // SUB C
         state.accumulator = subtract_byte(state, state.accumulator, state.c, CARRY::UPDATE_CARRY);
 		}
-	 0x91=> { // SUB D
+	 0x92=> { // SUB D
         state.accumulator = subtract_byte(state, state.accumulator, state.d, CARRY::UPDATE_CARRY);
 		}
-	 0x92=> { // SUB E
+	 0x93=> { // SUB E
         state.accumulator = subtract_byte(state, state.accumulator, state.e, CARRY::UPDATE_CARRY);
 		}
-	 0x93=> { // SUB H
+	 0x94=> { // SUB H
         state.accumulator = subtract_byte(state, state.accumulator, state.h, CARRY::UPDATE_CARRY);
 		}
-	 0x94=> { // SUB L
+	 0x95=> { // SUB L
         state.accumulator = subtract_byte(state, state.accumulator, state.l, CARRY::UPDATE_CARRY);
     }
-
    // ADC portion
    // add bytes with carry
    0x88=> { // ADC B
@@ -454,7 +454,9 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
 	 0x9d=> { // SBB L
         state.accumulator = subtract_byte_with_borrow(state, state.accumulator, state.l, CARRY::UPDATE_CARRY);
     }
-
+	 0x9f=> { // SBB L
+        state.accumulator = subtract_byte_with_borrow(state, state.accumulator, state.accumulator, CARRY::UPDATE_CARRY);
+    }
    // ANA portion
    // ANA means AND with accumulator
    	 0xa0=> { // ANA B
@@ -578,7 +580,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
    // ADI  data
    // Add immediate data to accumulator
    0xc6 => {
-       let rhs = state.memory[1];
+       let rhs = opcode[1];
         state.accumulator = add_byte(state, state.accumulator, rhs, CARRY::UPDATE_CARRY);
         state.program_counter += 1;
    }
@@ -586,7 +588,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
    // ACI data 
    // add immediate data to accumulator + carry
    0xce => {
-       let rhs = state.memory[1];
+       let rhs = opcode[1];
        state.accumulator = add_byte_with_carry(state, state.accumulator, rhs, CARRY::UPDATE_CARRY);
 
         state.program_counter += 1;
@@ -596,7 +598,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
    // SUI data 
    // subtract immediate data to accumulator
    0xd6 => {
-       let rhs = state.memory[1];
+       let rhs = opcode[1];
         state.accumulator = subtract_byte(state, state.accumulator, rhs, CARRY::UPDATE_CARRY);
 
         state.program_counter += 1;
@@ -605,16 +607,15 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
    // SBI data 
    // subtract immediate data to accumulator with borrow
    0xde => {
-       let rhs = state.memory[1];
+        let rhs = opcode[1];
         state.accumulator = subtract_byte_with_borrow(state, state.accumulator, rhs, CARRY::UPDATE_CARRY);
-
         state.program_counter += 1;
    }
 
    // ANI data
    // AND immediate with accumulator
    0xe6 => {
-       state.accumulator = state.accumulator & state.memory[1] as u8;
+       state.accumulator = (state.accumulator & opcode[1]) as u8;
        logic_flags(state);
 
         state.program_counter += 1;
@@ -623,7 +624,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
    // XRI data
    // XOR immediate with accumulator
    0xee => {
-       state.accumulator = state.accumulator ^ state.memory[1] as u8;
+       state.accumulator = state.accumulator ^ opcode[1] as u8;
        logic_flags(state);
 
         state.program_counter += 1;
@@ -631,7 +632,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
    // ORI data
    // OR immediate with accumulator
     0xf6 => {
-       state.accumulator = state.accumulator | state.memory[1] as u8;
+       state.accumulator = (state.accumulator | opcode[1]) as u8;
        logic_flags(state);
 
         state.program_counter += 1;
@@ -640,7 +641,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
    // CPI Data
    // compare immediate with accumulator
     0xfe => {
-        let rhs = state.memory[1];
+        let rhs = opcode[1];
         subtract_byte(state, state.accumulator, rhs, CARRY::UPDATE_CARRY);
 
         state.program_counter += 1;
@@ -703,11 +704,10 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     // STC
     // set carry flag. makes carry flag : 1
     0x37 => {
-        state.flag.carry = true;
+        state.flag.carry = !state.flag.carry;
     }
 
     // INR portion
-
 
     // INR B
     0x04 => {
@@ -1001,30 +1001,30 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     // Jump if carry flag is false
     0xd2 => {
         if state.flag.carry == false { 
-            state.program_counter = offset as u16 + ((opcode[2] as u16) << 8) | opcode[1] as u16;
+            state.program_counter = (offset + opcode[1] as usize) as u16;
         
         }else {
-            state.program_counter += 2;
+            state.program_counter += 1;
         }
     }
 
     // JZ
     0xca => {
         if state.flag.zero == true { 
-            state.program_counter = offset as u16 + ((opcode[2] as u16) << 8) | opcode[1] as u16;
-        
+            state.program_counter = (offset + opcode[1] as usize) as u16;
+            return Some(state.program_counter as u16);
         }else {
-            state.program_counter += 2;
+            state.program_counter += 1;
         }
 
     }
     // JNZ
     0xc2 => {
         if state.flag.zero == false { 
-            state.program_counter = offset as u16 + ((opcode[2] as u16) << 8) | opcode[1] as u16;
-        
+            state.program_counter = (offset + opcode[1] as usize) as u16;
+            return Some(state.program_counter as u16);
         }else {
-            state.program_counter += 2;
+            state.program_counter += 1;
         }
     }
 
@@ -1032,10 +1032,10 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     // jump if sign flag is positive
     0xf2 => {
     if state.flag.sign == false { 
-            state.program_counter = offset as u16 + ((opcode[2] as u16) << 8) | opcode[1] as u16;
-        
+            state.program_counter = (offset + opcode[1] as usize) as u16;
+            return Some(state.program_counter as u16);
         }else {
-            state.program_counter += 2;
+            state.program_counter += 1;
         }
 
     }
@@ -1044,10 +1044,10 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     // jump if parity flag is odd
     0xe2 => {
         if state.flag.parity == false { 
-            state.program_counter = offset as u16 + ((opcode[2] as u16) << 8) | opcode[1] as u16;
-        
+            state.program_counter = (offset + opcode[1] as usize) as u16;
+            return Some(state.program_counter as u16);
         }else {
-            state.program_counter += 2;
+            state.program_counter += 1;
         }
 
     }
@@ -1055,10 +1055,10 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     // jump if parity flag is even
     0xea => {
         if state.flag.parity == true { 
-            state.program_counter = offset as u16 + ((opcode[2] as u16) << 8) | opcode[1] as u16;
-        
+            state.program_counter = (offset + opcode[1] as usize) as u16;
+            return Some(state.program_counter as u16);
         }else {
-            state.program_counter += 2;
+            state.program_counter += 1;
         }
 
     }
@@ -1172,3 +1172,4 @@ fn logic_flags(state:&mut Processor8085) {
     state.flag.sign = 0x80 == (state.accumulator & 0x80);
     state.flag.parity = check_parity(state.accumulator, 8);
 }
+

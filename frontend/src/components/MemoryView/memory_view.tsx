@@ -7,7 +7,7 @@ import { Box, List, TextField } from '@mui/material';
 
 export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulator, loaded: boolean }) {
   let [startAddr, setStartAddr] = useState("0");
-  let [stopAddr, setStopAddr] = useState("300");
+  let [stopAddr, setStopAddr] = useState("20");
   let [data, setData] = useState<number[]>([]);
 
   function strToNumber(data: string): number {
@@ -22,7 +22,7 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
   }
 
   useEffect(() => {
-    console.log(emulator);
+    console.log(loaded);
     if (strToNumber(startAddr) < strToNumber(stopAddr)) {
       console.log(startAddr)
       console.log(stopAddr)
@@ -31,7 +31,6 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
       setData(arrCommon);
     }
   }, [loaded, startAddr, stopAddr]);
-
   return (
     <Box sx={{
       margin: "auto"
@@ -57,7 +56,7 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
 
       <List className='memoryView'>
         {data.map((s, i) => (
-          <Box sx={{
+          <Box key={i} sx={{
             margin: 0.3,
             padding: 0,
             width: 80,

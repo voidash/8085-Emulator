@@ -852,21 +852,21 @@ pub fn disassemble_data(codebuffer : &[u8] ,program_counter: usize) -> (String, 
 #[test]
 fn check_disassembly_nop() {
     let data = vec![0x00];
-    assert_eq!(disassemble_data(data, 0),(String::from("NOP"),1));
+    assert_eq!(disassemble_data(&data[..], 0),(String::from("NOP"),1));
 }
 
 #[test]
 #[allow(non_snake_case)]
 fn check_disassembly_MVI_B_23H() {
     let data = vec![0x06,0x23];
-    assert_eq!(disassemble_data(data, 0),(String::from("MVI    B,23"),2));
+    assert_eq!(disassemble_data(&data[..], 0),(String::from("MVI    B,23h"),2));
 }
 
 #[test]
 #[allow(non_snake_case)]
 fn check_disassembly() {
     let data = vec![0x01,0x23,0x34];
-    assert_eq!(disassemble_data(data, 0),(String::from("LXI  B, 3423"),3));
+    assert_eq!(disassemble_data(&data[..], 0),(String::from("LXI  B, 3423h"),3));
 }
 
 

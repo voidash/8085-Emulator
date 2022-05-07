@@ -7,14 +7,13 @@ import { Range } from 'monaco-editor/esm/vs/editor/editor.api';
 
 type CodeEditor = monaco.editor.IStandaloneCodeEditor;
 
-function CodeEditor({ changeHandler }: { changeHandler: () => void }) {
-    const editorRef = useRef<CodeEditor | null>(null);
+function CodeEditor({ dec, setDec ,changeHandler }: { dec: string[] , setDec: (l: string[]) => void, changeHandler: () => void ,}) {
     const monaco = useMonaco();
-    let [decoration, setDecoration] = useState<string[] | undefined>();
-
     let [code, setCode] = useState<string[]>([]);
+    let editorRef = useRef<CodeEditor | null >();
 
     function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor, _: Monaco) {
+        console.log("editor mounted");
         editorRef.current = editor;
     }
 
@@ -49,16 +48,21 @@ function CodeEditor({ changeHandler }: { changeHandler: () => void }) {
 
 
     function gotoLine() {
+        //editorRef.current?.dispose();
+        stopDecoration();
         var item = localStorage.getItem("lineToHighlight");
         if (item != null) {
             editorRef.current?.setPosition({ column: 1, lineNumber: parseInt(item) });
-            setDecoration(editorRef.current?.deltaDecorations([], [{
-                range: new Range(parseInt(item), 1, parseInt(item), 40),
+            let decs = editorRef.current?.deltaDecorations([], [{
+                range: new Range(parseInt(item), 1, parseInt(item), 1),
                 options: {
                     isWholeLine: true,
                     className: 'runDecorator'
                 }
-            }]));
+            }]) as string[];
+            localStorage.setItem("decoration", decs[0]);
+            setDec(decs);
+            console.log(decs);
         } else {
             stopDecoration();
         }
@@ -81,8 +85,7 @@ function CodeEditor({ changeHandler }: { changeHandler: () => void }) {
             stopDecoration();
         }
     }
-
-    function showError() {
+function showError() {
         var item = localStorage.getItem("8085-error");
         if (item) {
             var error = JSON.parse(item);
@@ -102,9 +105,7 @@ function CodeEditor({ changeHandler }: { changeHandler: () => void }) {
 
 
     function stopDecoration() {
-        if (decoration) {
-            editorRef.current?.deltaDecorations(decoration as string[], []);
-        }
+        editorRef.current?.deltaDecorations(["b;11"], []);
         monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-warning', [])
         monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-error', [])
     }
