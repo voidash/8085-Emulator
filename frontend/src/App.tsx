@@ -24,7 +24,8 @@ function App() {
         setTab(newValue);
     };
 
-    let [code, setCode] = useState<string[]>([]);
+    let [assembled, setAssembled] = useState<string>("");
+    let [code, setCode] = useState<string[]>(localStorage.getItem("code")?.split("\n") || []);
     const editorRef = useRef<CodeEditor | null>(null);
     let [line, setLine] = useState<number>(1);
     let [log, setLog] = useState<Log>({ type: LogType.NOTHING, LogString: "" })
@@ -108,6 +109,7 @@ function App() {
   }
 
     function loadProgram() {
+        onChange();
         setLine(0);
         let code = localStorage.getItem("code")?.split("\n") ?? [];
         loadEmulator(() => {
@@ -160,14 +162,57 @@ function App() {
     }
 
     function runMode() {
-        if (loaded) {
-            let c = emulator?.emulate();
+        if (loaded && code.length > 1) {
+           if(code[code.length - 1].trim().startsWith("hlt")) {
+                emulator?.emulate();
+                let val = pcLineVec.findIndex((val) => {
+                    return emulator?.program_counter() as number === val;
+                });
+                setLine(val + 1);
+                var newLine = val + 1;
+                gotoLine(val+1);
+                stopDecoration();
+           }else {
+            enqueueSnackbar('Code doesn\'t contain hlt instruction for Run mode. add "hlt" at last line', {
+                variant: 'error',
+                TransitionComponent: Collapse,
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }
+            });
+           }
+        } 
+
+        else {
+            enqueueSnackbar('Please load program first.', {
+                variant: 'warning',
+                TransitionComponent: Collapse,
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }
+            });
         }
     }
 
 
     function assemble() {
+        onChange();
+        setTab(1);
+        let assembledString =  "";
+        code.forEach((c) => {
+            let data = emulator?.get_assembly([c] as any);
+            console.log(data);
+            let assembledData = "" ;
+            data?.forEach((d) => {
+                assembledData +=" " + String(d) ;
+            });
 
+            assembledData += " ; " + c + "<br/>";
+            assembledString += assembledData;
+        });
+        setAssembled(assembledString);
     }
 
  function gotoLine(linenumber: number) {
@@ -203,7 +248,6 @@ function App() {
     }
 
     return (
-
         <div className="mainWindow">
             <Box display={'flex'} alignItems={'center'} justifyContent={'center'} py={2}>
                 <Stack
@@ -230,6 +274,12 @@ function App() {
             <Box className='desktopView'>
                 <Box display={"flex"} justifyContent={"space-between"}>
                     <Box className='editor'>
+                    <Tabs value={tabvalue} onChange={handleChange} centered>
+                        <Tab label="Editor" />
+                        <Tab label="Assembled Code" />
+                    </Tabs>
+
+                <TabPanel value={tabvalue} index={0}>
                         <Editor
                             value={localStorage.getItem("code") ?? "; Type Your Code Here"}
                             height="70vh"
@@ -244,6 +294,10 @@ function App() {
                             theme="vs-dark"
                             onMount={handleEditorDidMount}
                         />
+                    </TabPanel>
+                    <TabPanel value={tabvalue} index={1}>
+                        <div dangerouslySetInnerHTML ={{__html: assembled as string}} />
+                    </TabPanel>
                     </Box>
                     <Box className='information'>
                         {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />}

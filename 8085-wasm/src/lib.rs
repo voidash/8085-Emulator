@@ -83,6 +83,20 @@ impl Emulator {
        // my_vec.into_boxed_slice()
  //   }
 
+    pub fn get_assembly(&mut self, data: Box<[JsValue]>) -> Result<Box<[u8]>, JsValue> {
+       let formatted_data = data.iter().map(|s| { s.as_string().unwrap().to_lowercase() }).collect();
+       match generate_assembly_code(formatted_data) {
+           Ok(data) => {
+               let (assembled_code,meta) = data;
+               return Ok(assembled_code.into_boxed_slice());
+           }
+           Err(error_signal) => {
+            let error = JsValue::from(format!("{error}", error=error_signal.1));
+            return Err(error);
+           }
+       }
+    }
+
     pub fn load_program(&mut self,offset:usize, data: Box<[JsValue]>) -> Result<Box<[usize]>, JsValue> {
        let start_address = self.offset;
        let formatted_data = data.iter().map(|s| { s.as_string().unwrap().to_lowercase() }).collect();
@@ -117,7 +131,6 @@ impl Emulator {
 
     pub fn emulate(&mut self) -> u16{
         while let Some(program_counter) = emulate_8085(&mut self.state, self.offset) {
-            return program_counter;
         }
         return 0;
     }

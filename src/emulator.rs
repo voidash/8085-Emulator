@@ -129,7 +129,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     0x4d => {
         state.c = state.l;
     }
-    // MOV B, M
+    // MOV C, M
     0x4e => {
         let position: u16 = ((state.h as u16) << 8) | state.l as u16;
         state.c = state.memory[position as usize];
@@ -341,6 +341,11 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
         state.memory[position as usize ] = state.l;
     }
 
+    // MOV M, A
+    0x77 => {
+        let position: u16 = ((state.h as u16) << 8) | state.l as u16;
+        state.memory[position as usize ] = state.accumulator;
+    }
     /* LXI portion */
      
     // LXI B, data load data into BC register pair immediate
@@ -1086,7 +1091,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     //STA 
     // store accumulator directly in memroy 
     0x32 => {
-        let position: u16 = ((state.d as u16) << 8) | state.e as u16;
+        let position: u16 = ((opcode[2] as u16) << 8) | opcode[1] as u16;
         state.memory[position as usize] = state.accumulator;
         state.program_counter += 2;
     }    
@@ -1098,7 +1103,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
         state.memory[position as usize] = state.accumulator;
     }
     
-    // STAX B
+    // STAX D
     // store the contents of accumulator to the location defined by STAX
     0x12 => {
         let position: u16 = ((state.d as u16) << 8) | state.e as u16;
