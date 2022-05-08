@@ -20,7 +20,7 @@ fn remove_comments(line: &str) -> &str{
 }
 
 fn fix_hexadecimal(line: &str) -> String {
-    let re = Regex::new(r"[0-9]h").unwrap();
+    let re = Regex::new(r"[0-9abcdef]h").unwrap();
     if re.is_match(line){
         //find comma
         if let Some(decimal_start_pos) = line.rfind(" ") {
@@ -112,7 +112,7 @@ fn check_emulation() {
     println!("{:?}", meta);
 
     while let Some(pc) = emulator::emulate_8085(&mut new_state, 0) {
-        
+                
     }
 }
 
