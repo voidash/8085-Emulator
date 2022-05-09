@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/8085-Emulator/static/css/main.a11b705f.css",
-    "main.js": "/8085-Emulator/static/js/main.57885094.js",
+    "main.js": "/8085-Emulator/static/js/main.e4e4a7c2.js",
     "static/js/787.cda612ba.chunk.js": "/8085-Emulator/static/js/787.cda612ba.chunk.js",
     "static/media/wasm_8085_bg.wasm": "/8085-Emulator/static/media/wasm_8085_bg.2240440179968393b4e5.wasm",
     "static/media/codicon.ttf": "/8085-Emulator/static/media/codicon.ade705761eb7e702770d.ttf",
@@ -39,11 +39,11 @@
     "static/media/roboto-greek-ext-700-normal.woff2": "/8085-Emulator/static/media/roboto-greek-ext-700-normal.9674bc0ae12c2551d9d1.woff2",
     "index.html": "/8085-Emulator/index.html",
     "main.a11b705f.css.map": "/8085-Emulator/static/css/main.a11b705f.css.map",
-    "main.57885094.js.map": "/8085-Emulator/static/js/main.57885094.js.map",
+    "main.e4e4a7c2.js.map": "/8085-Emulator/static/js/main.e4e4a7c2.js.map",
     "787.cda612ba.chunk.js.map": "/8085-Emulator/static/js/787.cda612ba.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.a11b705f.css",
-    "static/js/main.57885094.js"
+    "static/js/main.e4e4a7c2.js"
   ]
 }

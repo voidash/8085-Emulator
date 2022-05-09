@@ -31,6 +31,13 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
       setData(arrCommon);
     }
   }, [loaded, startAddr, stopAddr]);
+
+  useEffect(() => {
+      let d = emulator?.watch_memory(strToNumber(startAddr), strToNumber(stopAddr));
+      let arrCommon = Array.prototype.slice.call(d);
+      setData(arrCommon);
+  }, [emulator?.watch_memory(strToNumber(startAddr), strToNumber(stopAddr))]);
+
   return (
     <Box sx={{
       margin: "auto"
@@ -84,9 +91,9 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
             }} >
               {(() => {
                 if (i <= arr.length-1 && i >= 1) {
-                  if (s == 0 && arr[i+1] == 0 && arr[i-1] == 0) {
-                      return "‎"
-                  }else {
+                  if (s == 0 && (arr[i+1] == 0 || arr[i-1] == 0)) {
+                      return "‎";
+                  } else{
                       return  "0x" + s.toString(16);
                   }
                 } else {
