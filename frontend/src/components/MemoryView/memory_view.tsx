@@ -7,7 +7,7 @@ import { Box, List, TextField } from '@mui/material';
 
 export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulator, loaded: boolean }) {
   let [startAddr, setStartAddr] = useState("0");
-  let [stopAddr, setStopAddr] = useState("0x50");
+  let [stopAddr, setStopAddr] = useState("0x100");
   let [data, setData] = useState<number[]>([]);
 
   function strToNumber(data: string): number {
@@ -46,17 +46,10 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
         <TextField error={strToNumber(startAddr) >= strToNumber(stopAddr)} helperText={strToNumber(startAddr) >= strToNumber(stopAddr) ? "Start can't be greater than stop." : ""} label="Start" variant="filled" inputProps={{ inputMode: 'numeric', }} onChange={(e) => {
           if (e.target.value.trim() === "") {
             setStartAddr('0');
+            setStopAddr('0x100');
           } else {
-
             setStartAddr(e.target.value);
-          }
-        }} />
-        <TextField error={strToNumber(startAddr) >= strToNumber(stopAddr)} helperText={strToNumber(startAddr) >= strToNumber(stopAddr) ? "Stop can't be smaller than start." : ""} label="Stop" variant="filled" inputProps={{ inputMode: 'numeric', }} onChange={(e) => {
-          if (e.target.value.trim() === "") {
-            setStopAddr('300');
-          } else {
-
-            setStopAddr(e.target.value);
+            setStopAddr(String(Number(e.target.value)+0x100));
           }
         }} />
       </Box>
