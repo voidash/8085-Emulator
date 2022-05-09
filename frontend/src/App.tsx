@@ -169,7 +169,8 @@ function App() {
 
     function runMode() {
         if (loaded && code.length > 1) {
-           if(code[code.length - 1].trim().startsWith("hlt")) {
+           let i = code.length;
+           if(code.map((c) => c.toLowerCase().trim()).includes("hlt")) {
                 emulator?.emulate();
                 let val = pcLineVec.findIndex((val) => {
                     return emulator?.program_counter() as number === val;
