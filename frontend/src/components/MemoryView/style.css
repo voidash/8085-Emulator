@@ -3,5 +3,5 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-content: justify;
-    justify-content: space-between;
+    justify-content: flex-start;
 }

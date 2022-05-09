@@ -24,7 +24,7 @@ function App() {
         setTab(newValue);
     };
 
-    let [assembled, setAssembled] = useState<string>("");
+    let [assembled, setAssembled] = useState<string>("<span class='comment'>Assemble First</span>");
     let [code, setCode] = useState<string[]>(localStorage.getItem("code")?.split("\n") || []);
     const editorRef = useRef<CodeEditor | null>(null);
     let [line, setLine] = useState<number>(1);
@@ -109,6 +109,8 @@ function App() {
   }
 
     function loadProgram() {
+        setTab(0);
+        if(!loaded && tabvalue === 0) {
         onChange();
         setLine(0);
         let code = localStorage.getItem("code")?.split("\n") ?? [];
@@ -118,7 +120,7 @@ function App() {
                 let programCounterToLineNumberMapping = emulator?.load_program(0, code) as Uint32Array;
                 setPcLineVec(programCounterToLineNumberMapping);
                 console.log("mapping is " +  programCounterToLineNumberMapping);
-                if (code.filter(opcode => opcode.trim().toLowerCase() == "hlt").length == 0) {
+                if (code.filter(opcode => opcode.trim().toLowerCase() === "hlt").length === 0) {
                     showWarning(code.length, "Program doesn't contain hlt instruction. Program might not halt. Hint: add HLT instruction");
                 }
             } catch (err: any) {
@@ -159,6 +161,10 @@ function App() {
         window.dispatchEvent(new Event("8085-error"));
         window.dispatchEvent(new Event("8085-warning"));
         window.dispatchEvent(new Event("highlightChange"));
+
+        }else {
+            setLoaded(false);
+        }
     }
 
     function runMode() {
@@ -206,10 +212,9 @@ function App() {
             console.log(data);
             let assembledData = "" ;
             data?.forEach((d) => {
-                assembledData +=" " + String(d) ;
+                assembledData +=" <span class='hex'>" + String(d) + "</span>" ;
             });
-
-            assembledData += " ; " + c + "<br/>";
+            assembledData += " <span class='comment'>;" + c + "</span><br/>";
             assembledString += assembledData;
         });
         setAssembled(assembledString);
@@ -236,6 +241,7 @@ function App() {
 
 
     var onChange = () => {
+        setLoaded(false);
         let codeBuffer: String = editorRef.current?.getValue() as String;
         setCode(codeBuffer.split("\n"));
         localStorage.setItem("code", codeBuffer.toString());
@@ -262,7 +268,7 @@ function App() {
                         Assemble
                     </Button>
                     <Button variant={loaded ? "contained" : "outlined"} startIcon={< SimCardDownload />}
-                        onClick={() => loadProgram()}>
+                        onClick={() =>  loadProgram()}>
                         {loaded ? "Loaded" : "Load Program"}
                     </Button><Button variant="outlined" endIcon={<BugReport />} onClick={() => debugMode()}>
                         Debug Mode
@@ -296,7 +302,7 @@ function App() {
                         />
                     </TabPanel>
                     <TabPanel value={tabvalue} index={1}>
-                        <div dangerouslySetInnerHTML ={{__html: assembled as string}} />
+                        <div className="assembledBlock" dangerouslySetInnerHTML ={{__html: assembled as string}} />
                     </TabPanel>
                     </Box>
                     <Box className='information'>
@@ -331,6 +337,6 @@ function App() {
             </Box>
         </div >
     );
-}
+    }
 
 export default App;

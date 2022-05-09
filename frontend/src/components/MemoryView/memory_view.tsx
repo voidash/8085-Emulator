@@ -7,7 +7,7 @@ import { Box, List, TextField } from '@mui/material';
 
 export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulator, loaded: boolean }) {
   let [startAddr, setStartAddr] = useState("0");
-  let [stopAddr, setStopAddr] = useState("20");
+  let [stopAddr, setStopAddr] = useState("0x50");
   let [data, setData] = useState<number[]>([]);
 
   function strToNumber(data: string): number {
@@ -37,7 +37,7 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
     }}>
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} py={2}>
         <TextField error={strToNumber(startAddr) >= strToNumber(stopAddr)} helperText={strToNumber(startAddr) >= strToNumber(stopAddr) ? "Start can't be greater than stop." : ""} label="Start" variant="filled" inputProps={{ inputMode: 'numeric', }} onChange={(e) => {
-          if (e.target.value.trim() == "") {
+          if (e.target.value.trim() === "") {
             setStartAddr('0');
           } else {
 
@@ -45,7 +45,7 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
           }
         }} />
         <TextField error={strToNumber(startAddr) >= strToNumber(stopAddr)} helperText={strToNumber(startAddr) >= strToNumber(stopAddr) ? "Stop can't be smaller than start." : ""} label="Stop" variant="filled" inputProps={{ inputMode: 'numeric', }} onChange={(e) => {
-          if (e.target.value.trim() == "") {
+          if (e.target.value.trim() === "") {
             setStopAddr('300');
           } else {
 
@@ -55,11 +55,11 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
       </Box>
 
       <List className='memoryView'>
-        {data.map((s, i) => (
+        {data.map((s, i, arr) => (
           <Box key={i} sx={{
             margin: 0.3,
             padding: 0,
-            width: 80,
+            width: 60,
             borderRadius: 0.5,
             backgroundColor: 'primary.dark',
             '&:hover': {
@@ -69,7 +69,7 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
           }}>
             <Box sx={{
               textAlign: 'center',
-              fontSize: 14,
+              fontSize: 12,
               padding: 1,
               backgroundColor: 'primary.light',
 
@@ -80,10 +80,19 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
               textAlign: 'center',
               fontSize: 18,
               color: "white",
-
               padding: 2,
             }} >
-              {s == 0 ? "‎" : "0x" + s.toString(16)}
+              {(() => {
+                if (i <= arr.length-1 && i >= 1) {
+                  if (s == 0 && arr[i+1] == 0 && arr[i-1] == 0) {
+                      return "‎"
+                  }else {
+                      return  "0x" + s.toString(16);
+                  }
+                } else {
+                      return "0x" + s.toString(16);
+                }
+              })()}
             </Box>
           </Box>
         ))}

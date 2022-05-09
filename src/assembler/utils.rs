@@ -15,6 +15,18 @@ pub fn convert_8085_dec_to_i32(data: &str) -> i32 {
     }
 }
 
+pub fn convert_modern_hex_to_i32(data: &str) -> i32 {
+    i32::from_str_radix(&data[2..data.len()], 16).unwrap()
+}
+
+pub fn convert_modern_oct_to_i32(data: &str) -> i32 {
+    i32::from_str_radix(&data[2..data.len()], 8).unwrap()
+}
+
+pub fn convert_modern_bin_to_i32(data: &str) -> i32 {
+    i32::from_str_radix(&data[2..data.len()], 2).unwrap()
+}
+
 #[test]
 fn test_hex_conversion() {
     assert_eq!(convert_8085_hex_to_i32("85H"), 133);

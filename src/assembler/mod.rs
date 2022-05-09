@@ -55,6 +55,7 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                 "di" => {assembled_vec.push(0xf3);},
                 "rm" => {assembled_vec.push(0xf8);},
                 "sphl" => {assembled_vec.push(0xf9);},
+                "pchl" => {assembled_vec.push(0xe9);}
                 "ei" => {assembled_vec.push(0xfb);},
                 "hlt" => {assembled_vec.push(0x76);},
                 _ => {

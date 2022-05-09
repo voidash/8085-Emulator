@@ -52,3 +52,12 @@ code {
     display: block;
   }
 }
+.assembledBlock {
+  background-color:#121212;
+}
+.hex {
+  color:white;
+}
+.comment {
+  color: green;
+}
