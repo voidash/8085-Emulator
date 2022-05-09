@@ -13,8 +13,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     let mut cycles:  u8 = 4;
     // for single byte code the offset is just one pc + 1 = next state.memory
     let mut opcode = &state.memory[(state.program_counter) as usize..];
-
-    #[allow(unused_parens,unused_assignments)]
+#[allow(unused_parens,unused_assignments)]
     match (state.memory[state.program_counter as usize]) {
     //HLT
     0x76 => {
@@ -275,35 +274,43 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     //MOV A, B
     0x78 => {
         state.accumulator = state.b;
+        logic_flags(state);
     }
     // MOV A, C
     0x79 => {
         state.accumulator = state.c;
+        logic_flags(state);
     }
     // MOV A, D
     0x7a => {
         state.accumulator = state.d;
+        logic_flags(state);
     }
     // MOV A, E
     0x7b => {
         state.accumulator = state.e;
+        logic_flags(state);
     }
     // MOV A, H
     0x7c => {
         state.accumulator = state.h;
+        logic_flags(state);
     }
     // MOV A, L
     0x7d => {
         state.accumulator = state.l;
+        logic_flags(state);
     }
     // MOV A, M
     0x7e => {
         let position: u16 = ((state.h as u16) << 8) | state.l as u16;
         state.accumulator = state.memory[position as usize];
+        logic_flags(state);
     }
     // MOV A, A
     0x7f => {
         state.accumulator = state.accumulator;
+        logic_flags(state);
     }
 
     // MOV M, B
@@ -380,87 +387,111 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     // ADD portion
    0x80 => { // ADD B
         state.accumulator = add_byte(state, state.accumulator, state.b, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x81=> { // ADD C
         state.accumulator = add_byte(state, state.accumulator, state.c, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x82=> { // ADD D
         state.accumulator = add_byte(state, state.accumulator, state.d, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x83=> { // ADD E
         state.accumulator = add_byte(state, state.accumulator, state.e, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x84=> { // ADD H
         state.accumulator = add_byte(state, state.accumulator, state.h, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x85=> { // ADD L
         state.accumulator = add_byte(state, state.accumulator, state.l, CARRY::UPDATE_CARRY);
+        logic_flags(state);
     }
 
     // SUB portion
    0x90=> { // SUB B
         let test = subtract_byte(state, state.accumulator, state.b, CARRY::UPDATE_CARRY);
         state.accumulator = test;
-        println!("{}", test);
+        logic_flags(state);
 		}
 	 0x91=> { // SUB C
         state.accumulator = subtract_byte(state, state.accumulator, state.c, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x92=> { // SUB D
         state.accumulator = subtract_byte(state, state.accumulator, state.d, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x93=> { // SUB E
         state.accumulator = subtract_byte(state, state.accumulator, state.e, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x94=> { // SUB H
         state.accumulator = subtract_byte(state, state.accumulator, state.h, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x95=> { // SUB L
         state.accumulator = subtract_byte(state, state.accumulator, state.l, CARRY::UPDATE_CARRY);
+        logic_flags(state);
     }
    // ADC portion
    // add bytes with carry
    0x88=> { // ADC B
         state.accumulator = add_byte_with_carry(state, state.accumulator, state.b, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x89=> { // ADC C
         state.accumulator = add_byte_with_carry(state, state.accumulator, state.c, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x8a=> { // ADC D
         state.accumulator = add_byte_with_carry(state, state.accumulator, state.d, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x8b=> { // ADC E
         state.accumulator = add_byte_with_carry(state, state.accumulator, state.e, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x8c=> { // ADC H
         state.accumulator = add_byte_with_carry(state, state.accumulator, state.h, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x8d=> { // ADC L
         state.accumulator = add_byte_with_carry(state, state.accumulator, state.l, CARRY::UPDATE_CARRY);
+        logic_flags(state);
     }
 
    // SBB portion
    // subtract bytes with carry
    0x98=> { // SBB B
         state.accumulator = subtract_byte_with_borrow(state, state.accumulator, state.b, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x99=> { // SBB C
         state.accumulator = subtract_byte_with_borrow(state, state.accumulator, state.c, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x9a=> { // SBB D
         state.accumulator = subtract_byte_with_borrow(state, state.accumulator, state.d, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x9b=> { // SBB E
         state.accumulator = subtract_byte_with_borrow(state, state.accumulator, state.e, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x9c=> { // SBB H
         state.accumulator = subtract_byte_with_borrow(state, state.accumulator, state.h, CARRY::UPDATE_CARRY);
+        logic_flags(state);
 		}
 	 0x9d=> { // SBB L
         state.accumulator = subtract_byte_with_borrow(state, state.accumulator, state.l, CARRY::UPDATE_CARRY);
+        logic_flags(state);
     }
 	 0x9f=> { // SBB L
         state.accumulator = subtract_byte_with_borrow(state, state.accumulator, state.accumulator, CARRY::UPDATE_CARRY);
+        logic_flags(state);
     }
    // ANA portion
    // ANA means AND with accumulator
@@ -664,6 +695,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     0x07 => {
         state.flag.carry = if state.accumulator & 0x01 == 1 {true} else {false};
         state.accumulator = (state.accumulator >> 1) | (state.accumulator << 7);
+        logic_flags(state);
     }
     // RAL 
     // rotate left accumulator through carry flag
@@ -674,6 +706,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
         carry_data= carry_data << 7;
         state.accumulator = (state.accumulator >> 1) | carry_data;
         state.flag.carry = if buffer & 0x01 == 1 {true} else {false};
+        logic_flags(state);
     }
 
     //RRC 
@@ -681,6 +714,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     0x0f => {
         state.flag.carry = if state.accumulator & 0b10000000 == 1 {true} else {false};
         state.accumulator = (state.accumulator << 1) | (state.accumulator >> 7);
+        logic_flags(state);
     }
 
 
@@ -691,6 +725,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
         let mut carry_data: u8= if state.flag.carry == true {1}  else {0};
         state.accumulator = (state.accumulator << 1) | carry_data;
         state.flag.carry = if buffer & 0b10000000 == 1 {true} else {false};
+        logic_flags(state);
     }
     
 
@@ -698,6 +733,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     // contents of accumulator is complemented
     0x2f => {
         state.accumulator = !state.accumulator;
+        logic_flags(state);
     }
 
     // CMC 
@@ -746,6 +782,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     // INR A
     0x3c => {
         state.accumulator += 1;
+        logic_flags(state);
     }
 
     // DCR portion
@@ -782,6 +819,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     // DCR A
     0x3d => {
         state.accumulator -= 1;
+        logic_flags(state);
     }
 
     // INX B
@@ -1074,18 +1112,21 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
         let position: u16 = ((opcode[2] as u16) << 8) | opcode[1] as u16;
         state.accumulator = state.memory[position as usize];
         state.program_counter += 2;
+        logic_flags(state);
     }
 
     // LDAX B 
     0x0a => {
         let position: u16 = ((state.b as u16) << 8) | state.c as u16;
         state.accumulator = state.memory[position as usize];
+        logic_flags(state);
     }
 
     // LDAX D 
     0x1a => {
         let position: u16 = ((state.d as u16) << 8) | state.e as u16;
         state.accumulator = state.memory[position as usize];
+        logic_flags(state);
     }
 
     //STA 
