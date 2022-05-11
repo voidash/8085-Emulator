@@ -16,6 +16,8 @@ import MemoryView from './components/MemoryView/memory_view';
 
 import EightOEightFiveDefinition from "./monaco/languageDefinition";
 import {useMediaQuery } from 'react-responsive';
+import ExampleCodeCollectionComponent from './components/ExampleComponent/exampleCode';
+
 function App() {
 
     const isMobile = useMediaQuery({query: '(max-width: 768px)'});
@@ -32,6 +34,7 @@ function App() {
     let [line, setLine] = useState<number>(1);
     let [log, setLog] = useState<Log>({ type: LogType.NOTHING, LogString: "" })
     let [pcLineVec, setPcLineVec] = useState<Uint32Array>(new Uint32Array());
+    let [debug, setDebug] = useState<boolean>(false);
     let [loaded, setLoaded] = useState<boolean>(false);
     let [emulator, setEmulator] = useState<wasm.Emulator | null>(null);
     let [decoration, setDecoration] = useState<string[] | undefined>();
@@ -54,6 +57,15 @@ function App() {
             }
             ;
         });
+
+        // for github star count
+        const script = document.createElement('script');
+
+        script.src = "https://buttons.github.io/buttons.js";
+        script.async = true;
+        script.defer = true;
+
+        document.body.appendChild(script);
     }, []);
 
   // load monaco
@@ -72,11 +84,13 @@ function App() {
         setCode(code);
         editorRef.current.setValue(code.join("\n"));
         setLoaded(false);
+        setDebug(false);
     }
   }, [isDesktop, isMobile]);
 
     function debugMode() {
         if (loaded) {
+            setDebug(true);
             emulator?.emulate_line_by_line();
             let val = pcLineVec.findIndex((val) => {
                 return emulator?.program_counter() as number === val;
@@ -98,6 +112,7 @@ function App() {
             });
         }
     }
+
  function showWarning(linenumber: number, errorString: string) {
     monaco?.editor.setModelMarkers(editorRef.current?.getModel() as monaco.editor.ITextModel, '8085-warning', [{
       startLineNumber: linenumber,
@@ -177,6 +192,7 @@ function App() {
 
         }else {
             setLoaded(false);
+            setDebug(false);
         }
     }
 
@@ -218,24 +234,29 @@ function App() {
 
 
     function assemble() {
-        onChange();
-        setTab(1);
-        let assembledString =  "";
-        code.forEach((c) => {
-            let data = emulator?.get_assembly([c] as any);
-            console.log(data);
-            let assembledData = "" ;
-            data?.forEach((d) => {
-                assembledData +=" <span class='hex'>" + String(d) + "</span>" ;
+        if (tabvalue == 0) {
+            onChange();
+            setTab(1);
+            let assembledString =  "";
+            code.forEach((c) => {
+                let data = emulator?.get_assembly([c] as any);
+                console.log(data);
+                let assembledData = "" ;
+                data?.forEach((d) => {
+                    assembledData +=" <span class='hex'>" + String(d) + "</span>" ;
+                });
+                assembledData += " <span class='comment'>;" + c + "</span><br/>";
+                assembledString += assembledData;
             });
-            assembledData += " <span class='comment'>;" + c + "</span><br/>";
-            assembledString += assembledData;
-        });
-        setAssembled(assembledString);
+            setAssembled(assembledString);
+        }else {
+            setTab(0);
+        }
     }
 
  function gotoLine(linenumber: number) {
     editorRef.current?.setPosition({column: 1, lineNumber: linenumber});
+    editorRef.current?.revealLine(linenumber);
     setDecoration(editorRef.current?.deltaDecorations([], [{
       range: new Range(linenumber,1,linenumber,40),
       options: {
@@ -255,6 +276,7 @@ function App() {
 
 
     var onChange = () => {
+        setDebug(false);
         setLoaded(false);
         let codeBuffer: String = editorRef.current?.getValue() as String;
         setCode(codeBuffer.split("\n"));
@@ -275,8 +297,20 @@ function App() {
                     return <p>load program first</p>;
                 };
 
+      function loadCode(cod: string) {
+          setLoaded(false);
+          console.log(cod);
+          localStorage.setItem("code", cod.toString());
+          setTab(0);
+      }
+
     return (
         <div className="mainWindow">
+            <div style={{
+                'textAlign' : 'center',
+                'marginTop': '10px'}}>
+                    <a className="github-button" href="https://github.com/voidash/8085-Emulator"  data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star voidash/8085-Emulator on GitHub">Star me on github</a>
+            </div>
             <Box display={'flex'} alignItems={'center'} justifyContent={'center'} py={2}>
                 <Stack
                     flexDirection={'row'}
@@ -285,17 +319,16 @@ function App() {
                     alignItems={'center'}
                     justifyContent={'center'}
                 >
-                    <Button variant="outlined" startIcon={<Build />} onClick={() => assemble()
-                    }>
-                        Assemble
-                    </Button>
                     <Button variant={loaded ? "contained" : "outlined"} startIcon={< SimCardDownload />}
                         onClick={() =>  loadProgram()}>
                         {loaded ? "Loaded" : "Load Program"}
                     </Button><Button variant="outlined" endIcon={<BugReport />} onClick={() => debugMode()}>
-                        Debug Mode
+                        {loaded && debug ? "Next Line": "Debug Mode"}
                     </Button><Button variant="outlined" endIcon={<RunCircle />} onClick={() => runMode()}>
                         Run Mode
+                    </Button>
+                    <Button variant="outlined" startIcon={<Build />} onClick={() => assemble() }>
+                        Assemble
                     </Button>
                 </Stack>
             </Box>
@@ -305,6 +338,7 @@ function App() {
                     <Tabs value={tabvalue} onChange={handleChange} centered>
                         <Tab label="Editor" />
                         <Tab label="Assembled Code" />
+                        <Tab label="Examples" />
                     </Tabs>
 
                 <TabPanel value={tabvalue} index={0}>
@@ -329,6 +363,9 @@ function App() {
                     </TabPanel>
                     <TabPanel value={tabvalue} index={1}>
                         <div className="assembledBlock" dangerouslySetInnerHTML ={{__html: assembled as string}} />
+                    </TabPanel>
+                    <TabPanel value={tabvalue} index={2}>
+                      <ExampleCodeCollectionComponent loadCode={loadCode}/>
                     </TabPanel>
                     </Box>
                     <Box className='information'>

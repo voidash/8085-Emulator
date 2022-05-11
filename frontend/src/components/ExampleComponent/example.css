@@ -1,0 +1,20 @@
+.question-block {
+  display:flex;
+  padding: 10px;
+  justify-content: center;
+  background: #d8e5e7;
+  margin: 10px;
+}
+
+.question {
+  width:80%;
+  padding:0 10px 0 10px;
+}
+
+.question-block button {
+  padding:8px;
+  background: #42a5f5;
+  border:none;
+  font-weight:bold;
+  border-radius:4px;
+}
