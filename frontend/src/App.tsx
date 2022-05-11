@@ -124,6 +124,7 @@ function App() {
                     showWarning(code.length, "Program doesn't contain hlt instruction. Program might not halt. Hint: add HLT instruction");
                 }
             } catch (err: any) {
+                console.log(err);
                 let error = err.split(";");
                 let lineNumber = parseInt(error);
                 let errorString = error[1];

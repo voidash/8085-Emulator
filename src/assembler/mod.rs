@@ -4,31 +4,35 @@ pub mod utils;
 pub mod assembly;
 use ast::{Opcode, Op};
 use utils::convert_8085_hex_to_i32;
-use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
+use std::collections::hash_map::DefaultHasher;
 
-pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> Result<Vec<u8>,String> {
-    let mut assembled_vec:Vec<u8> = Vec::new(); 
+pub fn assemble(parsed_line: Opcode) -> Result<Vec<usize>,String> {
+    let mut assembled_vec:Vec<usize> = Vec::new(); 
 
     match parsed_line.Op {
         Op::OpL(instruction,label) => {
+
             let ins = &instruction[..];
-            if let Some(offset) = label_offset_map.get(&label) {
-                match ins {
-                    "jc" => {assembled_vec.push(0xda);},
-                    "jmp" => {assembled_vec.push(0xc3);},
-                    "jnc" =>{assembled_vec.push(0xd2);},
-                    "jz" => {assembled_vec.push(0xca);},
-                    "jnz" => {assembled_vec.push(0xc2);},
-                    "jp" => {assembled_vec.push(0xf2);},
-                    "jm" => {assembled_vec.push(0xfa);},
-                    "jpe" => {assembled_vec.push(0xea);},
-                    "jpo" => {assembled_vec.push(0xe2);},
-                    _ => {
-                        return Err(format!("{} not is one of the instruction jc, jmp , jnc, jz, jnz, jp, jm, jpe or jpo, that takes <opcode> <label> ",ins));
-                    }
+            match ins {
+                "jc" => {assembled_vec.push(0xda);},
+                "jmp" => {assembled_vec.push(0xc3);},
+                "jnc" =>{assembled_vec.push(0xd2);},
+                "jz" => {assembled_vec.push(0xca);},
+                "jnz" => {assembled_vec.push(0xc2);},
+                "jp" => {assembled_vec.push(0xf2);},
+                "jm" => {assembled_vec.push(0xfa);},
+                "jpe" => {assembled_vec.push(0xea);},
+                "jpo" => {assembled_vec.push(0xe2);},
+                _ => {
+                    return Err(format!("{} not is one of the instruction jc, jmp , jnc, jz, jnz, jp, jm, jpe or jpo, that takes <opcode> <label> ",ins));
                 }
-                assembled_vec.push(*offset as u8);
             }
+
+            // hash labels
+            let mut s = DefaultHasher::new();
+            label.clone().hash(&mut s);
+            assembled_vec.push(s.finish() as usize);
         },
         Op::Op(instruction) => {
             let ins = &instruction[..];
@@ -197,7 +201,7 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
         Op::OpRA(instruction, register, address) => {
             let ins = &instruction[..];
             let register = &register[..];
-            let a_u8 = address as u8;
+            let a_u8 = address as usize;
 
             //for 16 bit
             // TODO: if data is greater than 2^16 then show error 
@@ -212,7 +216,7 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
                             return Err(format!("lxi {} doesn't exist. Supported register pair  are b, d, h , sp ",r));
                         }
                     }
-                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec());
+                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec().iter().map(|&val| {val as usize}).collect::<Vec<usize>>());
                 },
                 ("mvi", r) => {
                     match r {
@@ -242,61 +246,61 @@ pub fn assemble(parsed_line: Opcode, label_offset_map: &HashMap<String,u32>) -> 
             match ins {
                 "cpi" => {
                     assembled_vec.push(0xfe);
-                    assembled_vec.push(address as u8);
+                    assembled_vec.push(address as usize);
                 },
                 "ori" => {
                     assembled_vec.push(0xf6);
-                    assembled_vec.push(address as u8);
+                    assembled_vec.push(address as usize);
                 },
                 "ani" => {
                     assembled_vec.push(0xe6);
-                    assembled_vec.push(address as u8);
+                    assembled_vec.push(address as usize);
                 },
                 "sbi" => {
                     assembled_vec.push(0xde);
-                    assembled_vec.push(address as u8);
+                    assembled_vec.push(address as usize);
                 },
                 "in" => {
                     assembled_vec.push(0xdb);
-                    assembled_vec.push(address as u8);
+                    assembled_vec.push(address as usize);
                 },
                 "sui" => {
                     assembled_vec.push(0xd6);
-                    assembled_vec.push(address as u8);
+                    assembled_vec.push(address as usize);
                 },
                 "out" => {
                     assembled_vec.push(0xd3);
-                    assembled_vec.push(address as u8);
+                    assembled_vec.push(address as usize);
                 },
                 "aci" => {
                     assembled_vec.push(0xd8);
-                    assembled_vec.push(address as u8);
+                    assembled_vec.push(address as usize);
                 },
                 "adi" => {
                     assembled_vec.push(0xc6);
-                    assembled_vec.push(address as u8);
+                    assembled_vec.push(address as usize);
                 },
                 "lda" => {
                     assembled_vec.push(0x3a);
-                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec());
+                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec().iter().map(|&val| {val as usize}).collect::<Vec<usize>>());
                 },
                 "sta" => {
                     assembled_vec.push(0x32);
-                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec());
+                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec().iter().map(|&val| {val as usize}).collect::<Vec<usize>>());
                 },
                 "jpo" => {
                     assembled_vec.push(0xe2);
-                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec());
+                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec().iter().map(|&val| {val as usize}).collect::<Vec<usize>>());
 
                 },
                 "cpo" => {
                     assembled_vec.push(0xe4);
-                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec());
+                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec().iter().map(|&val| {val as usize}).collect::<Vec<usize>>());
 
                 },
                 "jmp" => {
                     assembled_vec.push(0xc3);
-                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec());
+                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec().iter().map(|&val| {val as usize}).collect::<Vec<usize>>());
                 },
                 _ => {
                     return Err(format!("{} {} doesn't exist. perhaps you meant to use jmp, cpo, jpo, sta, lda, adi, aci,ori or cpi ",ins,address));
@@ -569,9 +573,8 @@ fn opcode_check() {
         assembly::OpcodeParser::new().parse("mvi a").unwrap()
     );
 
-    let label_offset_map: HashMap<String, u32> = HashMap::new();
-    println!("{:?}",assemble(assembly::OpcodeParser::new().parse("mvi a, 32D").unwrap(), &label_offset_map));
-    println!("{:?}",assemble(assembly::OpcodeParser::new().parse("add b").unwrap(), &label_offset_map));
+    println!("{:?}",assemble(assembly::OpcodeParser::new().parse("mvi a, 32D").unwrap()));
+    println!("{:?}",assemble(assembly::OpcodeParser::new().parse("add b").unwrap()));
 }
 
 #[allow(dead_code)]
@@ -610,4 +613,5 @@ fn test_fix_hexadecimal() {
     println!("{}", fix_hexadecimal(data));
     println!("{}", fix_hexadecimal(y));
 }
+
 

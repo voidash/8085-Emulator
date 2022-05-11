@@ -11,10 +11,12 @@ use assembler::assemble;
 use assembler::assembly;
 use regex::RegexSet;
 
+use std::hash::{Hash, Hasher};
+use std::collections::hash_map::DefaultHasher;
 
 fn remove_comments(line: &str) -> &str{
     if let Some(index) = line.find(";") {
-        return &line[..index];
+        return &line[..index].trim();
     } 
     line
 }
@@ -63,10 +65,10 @@ fn fix_numbers(line: &str) -> String {
 
 #[test] 
 fn remove_comments_test() {
-    let data = "mov a, b ; where all the birds fly everything seems merrier";
+    let data = "mov a, 56h ; where all the birds fly everything seems merrier";
     let b = ";where all the birds fly everything seems merrier";
-    println!("{}", remove_comments(data));
-    println!("{}", remove_comments(b));
+    assert_eq!(remove_comments(data), "mov a, 56h");
+    assert_eq!(remove_comments(b), "");
 }
 
 #[test]
@@ -79,13 +81,14 @@ fn test_fix_hexadecimal() {
 }
 
 
+
+
 #[allow(unused_variables,unused_mut)]
 pub fn generate_assembly_code(lines:Vec<String>) -> Result<(Vec<u8>,Vec<usize>),(usize, String)> {
 
-    let mut label_offset_map: HashMap<String, u32> = HashMap::new();
+    let mut label_offset_map: HashMap<String, usize> = HashMap::new();
 
-
-    let mut assembly_code :Vec<u8> = Vec::new(); 
+    let mut assembly_code :Vec<usize> = Vec::new(); 
     let mut line_pc_vec: Vec<usize> = Vec::new();
     let mut line_number: usize = 0;
 
@@ -97,9 +100,9 @@ pub fn generate_assembly_code(lines:Vec<String>) -> Result<(Vec<u8>,Vec<usize>),
        match assembly::OpcodeParser::new().parse(line) {
            Ok(ops) => {
                if let Some(l) = &ops.Label {
-                   label_offset_map.insert(l.clone(), assembly_code.len() as u32);
+                   label_offset_map.insert(l.clone(), assembly_code.len());
                }
-               let assembled_code = assemble(ops, &label_offset_map);
+               let assembled_code = assemble(ops);
                match assembled_code {
                    Ok(mut code) => {
                        assembly_code.append(&mut code);
@@ -119,13 +122,38 @@ pub fn generate_assembly_code(lines:Vec<String>) -> Result<(Vec<u8>,Vec<usize>),
            }
        line_pc_vec.push(assembly_code.len());
     }
-    Ok((assembly_code,line_pc_vec))
+    // now replace hashes of labels with equivalent linenumber or offset present in assembly_code
+    for (key, value)  in label_offset_map.into_iter() {
+        // calculate the hash of key
+        let mut s = DefaultHasher::new();
+        key.clone().hash(&mut s);
+        let hash_value = s.finish() as usize;
+
+        assembly_code = assembly_code.iter().map(|&code| { 
+            if code == hash_value {
+               return value as usize;
+            }
+            return code;
+        }).collect();
+    }
+
+    // check if assembly_code still contains value bigger than 0xff
+    for (i, &code) in assembly_code.iter().enumerate(){
+        if code > 0xff {
+           //get line number
+           let line_num = line_pc_vec.iter().position(|&val| val == (i-1)).unwrap();
+           println!("{:?}", line_pc_vec);
+           return Err((line_num+2,format!("No where to jump to. There is no label ")));
+        }
+    }
+
+    Ok((assembly_code.iter().map(|&val| { val as u8 }).collect::<Vec<u8>>(),line_pc_vec))
 }
 
 
 #[test]
 fn test_if_assembly_generated() {
-    assert_eq!(generate_assembly_code(vec!["nop","trello: mvi c, 34H", "hello: mov b, c", "jz hello", "jnc trello"].iter().map(|&x| {String::from(x)}).collect()).unwrap().0,vec![0, 14, 52, 65, 202, 3, 210, 1]);
+    assert_eq!(generate_assembly_code(vec!["nop","trello: mvi c, 34H ; sure this should work", "hello: mov b, c", "jz hello", "jnc trello"].iter().map(|&x| {String::from(x)}).collect()).unwrap().0,vec![0, 14, 52, 65, 202, 3, 210, 1]);
   assert_eq!(generate_assembly_code(vec!["mov a, b".to_string()]).unwrap().0, vec![120]);
 }
 

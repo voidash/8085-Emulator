@@ -732,7 +732,7 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     // CMA 
     // contents of accumulator is complemented
     0x2f => {
-        state.accumulator = !state.accumulator;
+        state.accumulator = state.accumulator ^ 0xff;
         logic_flags(state);
     }
 
@@ -853,25 +853,25 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     
     // DCX B
     0x0b => {
-        state.b -= 1;
-        if state.b  == 0 {
-            state.c -= 1;
+        state.c -= 1;
+        if state.c  == 0 {
+            state.b -= 1;
         }
     }
 
     // DCX D
     0x1b => {
-        state.d -= 1;
-        if state.d  == 0 {
-            state.e -= 1;
+        state.e -= 1;
+        if state.e  == 0 {
+            state.d -= 1;
         }
 
     }
     // DCX H
     0x2b => {
-        state.h -= 1;
-        if state.h  == 0 {
-            state.l -= 1;
+        state.l -= 1;
+        if state.l  == 0 {
+            state.h -= 1;
         }
 
     }
@@ -879,8 +879,6 @@ pub fn emulate_8085(state:&mut Processor8085 ,mut offset: usize)  -> Option<u16>
     0x3b => {
         state.stack_pointer -= 1;
     }
-
-
 
     // DAD (Double Register ADD)
     // DAD B

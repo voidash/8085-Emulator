@@ -65,3 +65,9 @@ pub enum CARRY {
     UPDATE_CARRY,
     PRESERVE_CARRY
 }
+
+#[allow(dead_code,non_camel_case_types)]
+pub struct AssembledData {
+    pub name: Option<String>,
+    pub data: Option<u8>
+}
