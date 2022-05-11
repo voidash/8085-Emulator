@@ -32,11 +32,6 @@ export default function MemoryView({ emulator, loaded }: { emulator: wasm.Emulat
     }
   }, [loaded, startAddr, stopAddr]);
 
-  useEffect(() => {
-      let d = emulator?.watch_memory(strToNumber(startAddr), strToNumber(stopAddr));
-      let arrCommon = Array.prototype.slice.call(d);
-      setData(arrCommon);
-  }, [emulator?.watch_memory(strToNumber(startAddr), strToNumber(stopAddr))]);
 
   return (
     <Box sx={{

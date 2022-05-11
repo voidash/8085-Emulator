@@ -15,9 +15,11 @@ import CodeEditor from './components/Editor/editor';
 import MemoryView from './components/MemoryView/memory_view';
 
 import EightOEightFiveDefinition from "./monaco/languageDefinition";
-
+import {useMediaQuery } from 'react-responsive';
 function App() {
 
+    const isMobile = useMediaQuery({query: '(max-width: 768px)'});
+    const isDesktop = useMediaQuery({query: '(min-width: 768px)'});
     const [tabvalue, setTab] = useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -60,8 +62,18 @@ function App() {
         monaco.languages.register({id: '8085asm'});
         monaco.languages.setMonarchTokensProvider('8085asm', EightOEightFiveDefinition());
       }
+
   }, [monaco]); 
 
+
+  useEffect(() => {
+    if(editorRef.current != null){
+        console.log(editorRef.current.getValue());
+        setCode(code);
+        editorRef.current.setValue(code.join("\n"));
+        setLoaded(false);
+    }
+  }, [isDesktop, isMobile]);
 
     function debugMode() {
         if (loaded) {
@@ -251,9 +263,17 @@ function App() {
     }
 
     function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor, _: Monaco) {
-        console.log("editor mounted");
         editorRef.current = editor;
     }
+    let mem = () => {
+                    if (emulator == null) {
+                        return <p>loading</p>;
+                    }
+                    if (loaded) {
+                        return <MemoryView emulator={emulator as wasm.Emulator} loaded={loaded} />;
+                    }
+                    return <p>load program first</p>;
+                };
 
     return (
         <div className="mainWindow">
@@ -279,7 +299,7 @@ function App() {
                     </Button>
                 </Stack>
             </Box>
-            <Box className='desktopView'>
+            {isDesktop && <Box className='desktopView'>
                 <Box display={"flex"} justifyContent={"space-between"}>
                     <Box className='editor'>
                     <Tabs value={tabvalue} onChange={handleChange} centered>
@@ -289,15 +309,19 @@ function App() {
 
                 <TabPanel value={tabvalue} index={0}>
                         <Editor
+                            defaultValue={localStorage.getItem("code") ?? "; Type Your Code Here"}
                             value={localStorage.getItem("code") ?? "; Type Your Code Here"}
                             height="70vh"
                             width="100%"
                             onChange={onChange}
                             defaultLanguage="8085asm"
-                            defaultValue="; Type your code here"
                             options={{
                                 fontSize: 20,
-                                minimap: { enabled: false }
+                                acceptSuggestionOnCommitCharacter: false,
+                                acceptSuggestionOnEnter: "off",
+                                wordBasedSuggestions: false,
+                                minimap: { enabled: false 
+                            }
                             }}
                             theme="vs-dark"
                             onMount={handleEditorDidMount}
@@ -316,9 +340,9 @@ function App() {
                 <Divider>
                     <Chip label="Memory View" />
                 </Divider>
-                {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={loaded} />}
-            </Box>
-            <Box className='mobileView'>
+                {mem()}
+            </Box> }
+            {isMobile && <Box className='mobileView'>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs value={tabvalue} onChange={handleChange} centered>
                         <Tab label="Code Editor" />
@@ -328,6 +352,23 @@ function App() {
                 </Box>
                 <TabPanel value={tabvalue} index={0}>
                     {/*<CodeEditor  dec={decoration as string[]} setDec={(value: string[]) => {setDecoration(value)}} changeHandler={() => { setLoaded(false) }} />*/}
+                        <Editor
+                            defaultValue={localStorage.getItem("code") ?? "; Type Your Code Here"}
+                            value={localStorage.getItem("code") ?? "; Type Your Code Here"}
+                            height="70vh"
+                            width="100%"
+                            onChange={onChange}
+                            defaultLanguage="8085asm"
+                            options={{
+                                acceptSuggestionOnCommitCharacter: false,
+                                acceptSuggestionOnEnter: "off",
+                                wordBasedSuggestions: false,
+                                fontSize: 20,
+                                minimap: { enabled: false }
+                            }}
+                            theme="vs-dark"
+                            onMount={handleEditorDidMount}
+                        />
                 </TabPanel>
                 <TabPanel value={tabvalue} index={1}>
                     {emulator == null ? "loading" : <Flags emulator={emulator as wasm.Emulator} />}
@@ -336,7 +377,7 @@ function App() {
                 <TabPanel value={tabvalue} index={2}>
                     {emulator == null ? "loading" : <MemoryView emulator={emulator as wasm.Emulator} loaded={loaded} />}
                 </TabPanel>
-            </Box>
+            </Box> }
         </div >
     );
     }

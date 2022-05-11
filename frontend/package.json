@@ -20,12 +20,13 @@
     "notistack": "^2.0.4",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-responsive": "^9.0.0-beta.8",
     "react-scripts": "5.0.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "BUILD_PATH='../docs' react-scripts build",
+    "build": "BUILD_PATH='../../deploy' react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
