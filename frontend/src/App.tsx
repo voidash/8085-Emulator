@@ -91,13 +91,29 @@ function App() {
     function debugMode() {
         if (loaded) {
             setDebug(true);
-            emulator?.emulate_line_by_line();
-            let val = pcLineVec.findIndex((val) => {
-                return emulator?.program_counter() as number === val;
+            // Program Counter Line Vector or PCLineVec contains index as line number and position on memory where it is loaded as value.
+            // finding the line number where our emulator's program counter is pointing to
+            if(debug) {
+                emulator?.emulate_line_by_line();
+            }
+            console.log(pcLineVec);
+            console.log(emulator?.program_counter());
+            let val = pcLineVec.findIndex((v) => {
+                return emulator?.program_counter() as number === v;
             });
-            setLine(val + 1);
-            var newLine = val + 1;
-            gotoLine(val+1);
+            // find next line number that is not equal to same program counter value 
+            let nextLine = pcLineVec.findIndex((v) => {
+                console.log(v);
+                return v > pcLineVec[val];
+            });
+            console.log(nextLine+1);
+            if (nextLine === -1) {
+                nextLine = val+1;
+            }
+            setLine(nextLine+1);
+            var newLine = nextLine+1;
+            gotoLine(nextLine+1);
+
             stopDecoration();
             localStorage.setItem("lineToHighlight", newLine.toString());
             //window.dispatchEvent(new Event('highlightChange'));
