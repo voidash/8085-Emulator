@@ -1,17 +1,100 @@
-# 8085 Emulator
-8085 emulator implements the instruction set provided by the 8085 microprocessor and allows writing , editing , running and debugging assembly programs written for the 8085 instruction set. 
-8085 emulator is also intended to be used as learning resource as it will provide documentation and guide for how to write programs on 8085 instruction set. 
+# 8085 Emulator 
 
+### LIVE on [voidash.github.io/8085-Emulator/](voidash.github.io/8085-Emulator/)
+8085 emulator implements the instruction set provided by the 8085 microprocessor and allows running assembly programs for that architecture.  
 
+### Purpose
+8085 emulator is intended to be used as learning resource as it will provide documentation and guide for how to write programs on 8085 instruction set. 
 ## Design Process
-The core emulation part will be implemented using Rust. To make sure the implementation works according to how 8085 works, working and programming manual [http://www.nj7p.org/Manuals/PDFs/Intel/9800301C.pdf](http://www.nj7p.org/Manuals/PDFs/Intel/9800301C.pdf) will be used.The implementation will also follow WASM guidelines which makes sure the code can be ported to WASM and produce .wat file. Generated .wat file will then be used in our frontend portion. The UI portion will be implemented using javascript’s state management library called React. 
+
+## CLI App, Assembler,  Emulator and Disassembler
+- The core emulation is implemented using Rust using this programming manual [http://www.nj7p.org/Manuals/PDFs/Intel/9800301C.pdf](http://www.nj7p.org/Manuals/PDFs/Intel/9800301C.pdf).  
+- The UI portion is implemented using React library for Javascript.
 
 <img src="./assets/process.png" width=300 height=400 />
 
-*Fig. 3.1 Overall design procedure for 8085 emulator*
+*Overall design procedure for 8085 emulator*
 
-Frontend/UI portion will have its own code editor that supports syntax highlighting, step by step code running.  a register lookup table for looking what is being stored when the program runs, a memory view table to look at memory contents, output section to see the output of a program, flag section to show what flags are currently enabled. 
+## Building the project 
 
-<img src="./assets/wireframe.png" width=600 height=600 />
+### Web Application
 
-*Fig. 3.1 Wireframe for UI portion*
+- clone this project: `https://github.com/voidash/8085-Emulator.git`
+- `cd 8085-wasm`
+- `./build-wasm.sh`
+- `cd ../frontend/`
+- `npm install`
+- `npm run build`
+	
+### CLI Application
+
+- clone this project: `https://github.com/voidash/8085-Emulator.git`
+- `cargo build --release`
+
+
+## How to use CLI application
+
+```
+$ ./emulator --help
+emulator 0.1.0
+
+USAGE:
+    emulator [OPTIONS] [FILENAME]
+
+ARGS:
+    <FILENAME>    if filename is not passed then the program will run on interpreted mode
+
+OPTIONS:
+    -a, --assemble           pass filename and generate assembly code
+    -d, --disassemble        pass .asm file and disassemble them
+    -e, --emulate            emulate 8085 and write its state and memory values to file
+    -h, --help               Print help information
+    -i, --interpreted        run on interpreted mode
+    -o, --output <OUTPUT>    If output is not provided then the program will assume writing to
+                             stdout
+    -V, --version            Print version information
+```
+
+- `$ emulator --interpreted ` to run on interpreted mode  
+```
+			  8085 Prompt > mvi a, 45h
+				mvi a, 69
+				[62, 69]
+				8085 Prompt > mvi b, 55h
+				mvi b, 85
+				[6, 85]
+				8085 Prompt > add b
+				add b
+				[128]
+				8085 Prompt > show state
+				 
+
+				|-------------|-------------|
+				|accumulator: 9a      | 
+				|-------------|-------------|
+				|b: 55        | c: 0        | 
+				|-------------|-------------|
+				|d: 0         | e: 0        | 
+				|-------------|-------------|
+				|h: 0         | l: 0        | 
+				|-------------|-------------|
+				|stack pointer:  0          | 
+				|-------------|-------------|
+				|program counter:  5        | 
+				|-------------|-------------|
+				|s: true,z:false,AC:false,P:true,CY:false| 
+				|-------------|-------------| 
+	```
+	
+- `$ emulator --assemble filename.asm --output filename.dsm ` to run on interpreted mode  
+- `$ emulator --emualate filename.asm` to emulate the assembled file 
+- `$ emulator --disassemble filename.dsm` to disassemble the assembled file  
+
+## Snapshots
+
+![8085EmulatorUI](assets/8085EmulatorUI.png)
+*UI of 8085Emulator*
+
+
+
+
