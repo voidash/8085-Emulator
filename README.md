@@ -1,6 +1,7 @@
 # 8085 Emulator 
 
 ### LIVE on [voidash.github.io/8085-Emulator/](voidash.github.io/8085-Emulator/)
+
 8085 emulator implements the instruction set provided by the 8085 microprocessor and allows running assembly programs for that architecture.  
 
 ### Purpose
@@ -84,11 +85,11 @@ OPTIONS:
 				|-------------|-------------|
 				|s: true,z:false,AC:false,P:true,CY:false| 
 				|-------------|-------------| 
-	```
+```
 	
-- `$ emulator --assemble filename.asm --output filename.dsm ` to run on interpreted mode  
-- `$ emulator --emualate filename.asm` to emulate the assembled file 
-- `$ emulator --disassemble filename.dsm` to disassemble the assembled file  
+- `$ emulator --assemble filename.asm --output filename.dsm ` to *assemble* the file
+- `$ emulator --emualate filename.asm` to *emulate* the assembled file 
+- `$ emulator --disassemble filename.dsm` to *disassemble* the assembled file  
 
 ## Snapshots
 
