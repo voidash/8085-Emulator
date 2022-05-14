@@ -140,10 +140,16 @@ pub fn generate_assembly_code(lines:Vec<String>) -> Result<(Vec<u8>,Vec<usize>),
     // check if assembly_code still contains value bigger than 0xff
     for (i, &code) in assembly_code.iter().enumerate(){
         if code > 0xff {
-           //get line number
-           let line_num = line_pc_vec.iter().position(|&val| val == (i-1)).unwrap();
            println!("{:?}", line_pc_vec);
-           return Err((line_num+2,format!("No where to jump to. There is no label ")));
+           println!("{:?}", assembly_code);
+           match line_pc_vec.iter().position(|&val| val == (i-1))  {
+           Some(line_num) => {
+               return Err((line_num+2,format!("No where to jump to. Please check the label name")));
+           },
+           None => {
+               return Err((0,format!("No where to jump to. Please check the label name")));
+           }
+           }
         }
     }
 
@@ -153,8 +159,8 @@ pub fn generate_assembly_code(lines:Vec<String>) -> Result<(Vec<u8>,Vec<usize>),
 
 #[test]
 fn test_if_assembly_generated() {
-    assert_eq!(generate_assembly_code(vec!["nop","trello: mvi c, 34H ; sure this should work", "hello: mov b, c", "jz hello", "jnc trello"].iter().map(|&x| {String::from(x)}).collect()).unwrap().0,vec![0, 14, 52, 65, 202, 3, 210, 1]);
-  assert_eq!(generate_assembly_code(vec!["mov a, b".to_string()]).unwrap().0, vec![120]);
+    //assert_eq!(generate_assembly_code(vec!["nop","trello: mvi c, 34H ; sure this should work", "hello: mov b, c", "jz hello", "jnc trello"].iter().map(|&x| {String::from(x)}).collect()).unwrap().0,vec![0, 14, 52, 65, 202, 3, 210, 1]);
+  assert_eq!(generate_assembly_code(vec!["jmp test".to_string()]).unwrap().0, vec![120]);
 }
 
 #[test]

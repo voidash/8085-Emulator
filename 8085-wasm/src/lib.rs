@@ -112,7 +112,8 @@ impl Emulator {
                return Ok(meta.into_boxed_slice());
            } 
            Err(error_signal) => {
-            let error = JsValue::from(format!("{linenumber}; {error}", linenumber=error_signal.0, error=error_signal.1));
+           self.state.memory[0] = 0;
+           let error = JsValue::from(format!("{linenumber}; {error}", linenumber=error_signal.0, error=error_signal.1));
            return Err(error);
            }
        }

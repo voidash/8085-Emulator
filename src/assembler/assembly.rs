@@ -1,5 +1,5 @@
-// auto-generated: "lalrpop 0.19.7"
-// sha3: fc7e824a58388341d8f8a41bbbaca88e1425befbfd706eb03db9badd68eb163
+// auto-generated: "lalrpop 0.19.8"
+// sha3: fc7e824a58388341d8f8a41bbbaca88e1425befbfd706eb03db9ba0dd68eb163
 use crate::assembler::utils;
 use crate::assembler::ast::{Op, Opcode};
 #[allow(unused_extern_crates)]

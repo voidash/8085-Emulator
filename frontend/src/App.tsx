@@ -168,11 +168,11 @@ function App() {
                 }
             } catch (err: any) {
                 console.log(err);
-                let error = err.split(";");
-                let lineNumber = parseInt(error);
-                let errorString = error[1];
+               let error = err.split(";");
+               let lineNumber = parseInt(error);
+               let errorString = error[1];
 
-                showError(lineNumber, errorString);
+               showError(lineNumber, errorString);
 
                 enqueueSnackbar(`Program couldnt load due to error on line ${lineNumber}`, {
                     variant: 'error',
