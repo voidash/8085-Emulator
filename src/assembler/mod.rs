@@ -296,14 +296,17 @@ pub fn assemble(parsed_line: Opcode) -> Result<Vec<usize>,String> {
                 "cpo" => {
                     assembled_vec.push(0xe4);
                     assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec().iter().map(|&val| {val as usize}).collect::<Vec<usize>>());
-
                 },
                 "jmp" => {
                     assembled_vec.push(0xc3);
                     assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec().iter().map(|&val| {val as usize}).collect::<Vec<usize>>());
                 },
+                "SHLD" => {
+                    assembled_vec.push(0x22);
+                    assembled_vec.append(&mut (address as u16).to_le_bytes().to_vec().iter().map(|&val| {val as usize}).collect::<Vec<usize>>());
+                },
                 _ => {
-                    return Err(format!("{} {} doesn't exist. perhaps you meant to use jmp, cpo, jpo, sta, lda, adi, aci,ori or cpi ",ins,address));
+                    return Err(format!("{} {} doesn't exist. perhaps you meant to use jmp, cpo, jpo, sta, lda, adi, aci,ori, cpi or SHLD",ins,address));
                 } }
         },
         Op::OpR(instruction, register) => {

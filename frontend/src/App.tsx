@@ -95,6 +95,7 @@ function App() {
     function debugMode() {
         if (loaded) {
             setDebug(true);
+            setTab(0);
             // Program Counter Line Vector or PCLineVec contains index as line number and position on memory where it is loaded as value.
             // finding the line number where our emulator's program counter is pointing to
             if(debug) {
@@ -217,6 +218,7 @@ function App() {
     }
 
     function runMode() {
+        setTab(0);
         if (loaded && code.length > 1) {
            let i = code.length;
            if(code.map((c) => c.toLowerCase().trim()).includes("hlt")) {
