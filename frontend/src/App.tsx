@@ -25,10 +25,14 @@ function App() {
     const [tabvalue, setTab] = useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        // if users go to Tab no 2 or assemble mode
+        if(newValue == 1) {
+            assemble();
+        }
         setTab(newValue);
     };
 
-    let [assembled, setAssembled] = useState<string>("<span class='comment'>Assemble First</span>");
+    let [assembled, setAssembled] = useState<string>("<span class='comment'>Load Program First</span>");
     let [code, setCode] = useState<string[]>(localStorage.getItem("code")?.split("\n") || []);
     const editorRef = useRef<CodeEditor | null>(null);
     let [line, setLine] = useState<number>(1);
@@ -250,23 +254,18 @@ function App() {
 
 
     function assemble() {
-        if (tabvalue == 0) {
-            onChange();
-            setTab(1);
+        if (loaded) {
             let assembledString =  "";
-            code.forEach((c) => {
-                let data = emulator?.get_assembly([c] as any);
-                console.log(data);
+            let loadedData = emulator?.watch_memory(0,pcLineVec[pcLineVec.length-1]);
+            code.forEach((c,i) => {
                 let assembledData = "" ;
-                data?.forEach((d) => {
-                    assembledData +=" <span class='hex'>" + String(d) + "</span>" ;
-                });
+                for(let j = i==0?0:pcLineVec[i-1]; j < pcLineVec[i]; j++) {
+                    assembledData += `<span class='hex'>${loadedData != undefined ? loadedData[j].toString(16) : 0} </span>`;
+                }
                 assembledData += " <span class='comment'>;" + c + "</span><br/>";
                 assembledString += assembledData;
             });
             setAssembled(assembledString);
-        }else {
-            setTab(0);
         }
     }
 
@@ -342,9 +341,6 @@ function App() {
                         {loaded && debug ? "Next Line": "Debug Mode"}
                     </Button><Button variant="outlined" endIcon={<RunCircle />} onClick={() => runMode()}>
                         Run Mode
-                    </Button>
-                    <Button variant="outlined" startIcon={<Build />} onClick={() => assemble() }>
-                        Assemble
                     </Button>
                 </Stack>
             </Box>
